@@ -22,13 +22,14 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public String register(RegisterUserRequest request) {
+    public User register(RegisterUserRequest request) {
         String username = request.getUsername();
+
         isNotDuplicatedUsername(username);
         User user = createUser(username);
 
         log.info("user, \"{}\" is created", user.getUsername());
-        return userRepository.save(user).getPw();
+        return userRepository.save(user);
     }
 
     private static User createUser(String username) {

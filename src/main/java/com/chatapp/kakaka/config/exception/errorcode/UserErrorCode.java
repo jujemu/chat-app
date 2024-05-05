@@ -4,13 +4,12 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
-import static org.springframework.http.HttpStatus.*;
-
 @Getter
 @RequiredArgsConstructor
 public enum UserErrorCode implements ErrorCode{
 
-    DUPLICATED_USERNAME(FORBIDDEN, "The username already exists");
+    DUPLICATED_USERNAME(HttpStatus.FORBIDDEN, "The username already exists"),
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "The user cannot be found");
 
     private final HttpStatus httpStatus;
     private final String message;

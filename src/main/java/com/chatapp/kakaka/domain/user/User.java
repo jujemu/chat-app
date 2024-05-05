@@ -1,7 +1,6 @@
 package com.chatapp.kakaka.domain.user;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,18 +16,18 @@ public class User {
     private Long id;
     @Column(unique = true, nullable = false)
     private String username;
-    private String pw;
+    private String uuid;
 
     @Builder
-    private User(String username, String pw) {
+    private User(String username, String uuid) {
         this.username = username;
-        this.pw = pw;
+        this.uuid = uuid;
     }
 
-    public static User createUser(String username, String pw) {
+    public static User createUser(String username, String uuid) {
         return User.builder()
                 .username(username)
-                .pw(pw)
+                .uuid(uuid)
                 .build();
     }
 }

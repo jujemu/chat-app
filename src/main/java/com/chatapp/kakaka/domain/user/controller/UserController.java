@@ -17,6 +17,6 @@ public class UserController {
 
     @PostMapping("/create")
     public String registerNewUser(@Valid @RequestBody RegisterUserRequest request) {
-        return userService.register(request);
+        return userService.register(request).getUuid();
     }
 }
