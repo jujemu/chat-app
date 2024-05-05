@@ -32,7 +32,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    private static User createUser(String username) {
+    private User createUser(String username) {
         String pw = UUID.randomUUID().toString();
         User user = User.createUser(username, pw);
         return user;
