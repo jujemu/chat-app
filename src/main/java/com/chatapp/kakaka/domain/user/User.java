@@ -1,9 +1,12 @@
 package com.chatapp.kakaka.domain.user;
 
+import com.chatapp.kakaka.domain.chat.ChatRoom;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Getter
 @NoArgsConstructor
@@ -17,6 +20,9 @@ public class User {
     @Column(unique = true, nullable = false)
     private String username;
     private String uuid;
+
+    @OneToMany(mappedBy = "userA", cascade = CascadeType.ALL)
+    private List<ChatRoom> chatRooms;
 
     @Builder
     private User(String username, String uuid) {
