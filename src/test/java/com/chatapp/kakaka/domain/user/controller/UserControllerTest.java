@@ -44,7 +44,7 @@ class UserControllerTest {
 
         // when
         ResultActions perform = mockMvc.perform(
-                post("/api/v1/create")
+                post("/create")
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
         );
@@ -66,7 +66,7 @@ class UserControllerTest {
 
         // when
         ResultActions perform = mockMvc.perform(
-                post("/api/v1/create")
+                post("/create")
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
         );
