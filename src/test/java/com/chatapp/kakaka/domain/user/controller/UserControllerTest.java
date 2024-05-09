@@ -83,9 +83,6 @@ class UserControllerTest {
     }
 
     private User createUser(String username) {
-        return User.builder()
-                .username(username)
-                .uuid("test uuid")
-                .build();
+        return User.createUser(username, "test uuid");
     }
 }

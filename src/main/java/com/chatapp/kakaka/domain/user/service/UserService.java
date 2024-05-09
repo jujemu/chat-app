@@ -1,7 +1,9 @@
 package com.chatapp.kakaka.domain.user.service;
 
-import com.chatapp.kakaka.config.exception.RestApiException;
-import com.chatapp.kakaka.config.exception.errorcode.UserErrorCode;
+import com.chatapp.kakaka.exception.RestApiException;
+import com.chatapp.kakaka.exception.errorcode.UserErrorCode;
+import com.chatapp.kakaka.domain.friend.Friend;
+import com.chatapp.kakaka.domain.friend.repository.FriendRepository;
 import com.chatapp.kakaka.domain.user.User;
 import com.chatapp.kakaka.domain.user.controller.RegisterUserRequest;
 import com.chatapp.kakaka.domain.user.repository.UserRepository;
@@ -10,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -20,6 +23,7 @@ import java.util.UUID;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final FriendRepository friendRepository;
 
     /*
     만약 등록되어 있지 않은 회원이라면 username 으로 회원가입을 하고,
@@ -32,6 +36,15 @@ public class UserService {
 
         User user = createUser(username);
         userRepository.save(user);
+
+        // 초기 플러스 친구 추가하기
+        List<User> plusUsers = userRepository.findPlusUsers();
+        List<Friend> initFriends = plusUsers.stream()
+                .map(plus ->
+                        Friend.requestPlusFriend(user, plus))
+                .toList();
+        friendRepository.saveAll(initFriends);
+
         return new LoginResponse(user, true);
     }
 
