@@ -1,6 +1,6 @@
-package com.chatapp.kakaka.config.exception;
+package com.chatapp.kakaka.exception;
 
-import com.chatapp.kakaka.config.exception.errorcode.ErrorCode;
+import com.chatapp.kakaka.exception.errorcode.ErrorCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

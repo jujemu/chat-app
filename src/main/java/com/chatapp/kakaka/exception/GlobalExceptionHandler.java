@@ -1,7 +1,9 @@
-package com.chatapp.kakaka.config.exception;
+package com.chatapp.kakaka.exception;
 
-import com.chatapp.kakaka.config.exception.errorcode.CommonErrorCode;
-import com.chatapp.kakaka.config.exception.errorcode.ErrorCode;
+import com.chatapp.kakaka.exception.errorcode.CommonErrorCode;
+import com.chatapp.kakaka.exception.errorcode.ErrorCode;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
@@ -32,6 +34,17 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<ErrorResponse> handleCustomException(RestApiException e) {
         ErrorCode errorCode = e.getErrorCode();
         return handleExceptionInternal(errorCode);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<Object> handleCustomException(ConstraintViolationException e) {
+        ErrorCode errorCode = CommonErrorCode.INVALID_PARAMETER;
+        List<String> messages = e.getConstraintViolations().stream()
+                .map(ConstraintViolation::getMessage).toList();
+        return handleExceptionConstraintViolation(
+                    String.join("\n", messages),
+                    errorCode
+        );
     }
 
     @Override
@@ -76,6 +89,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .code(errorCode.name())
                 .message(message)
                 .build();
+    }
+
+    private ResponseEntity<Object> handleExceptionConstraintViolation(String message, ErrorCode errorCode) {
+        return ResponseEntity.status(errorCode.getHttpStatus())
+                .body(makeErrorResponse(errorCode, message));
     }
 
     private ResponseEntity<Object> handleExceptionInternal(BindException e, ErrorCode errorCode) {
