@@ -34,6 +34,9 @@ public class ChatRoom extends BaseEntity {
      * id가 작은 유저를 userA에 저장한다.
      */
     public static ChatRoom createChatRoom(User userA, User userB) {
+        if (userA == null || userB == null || userA.equals(userB))
+            throw new IllegalArgumentException("UserA and userB can not be null or same.");
+
         if (isFirstIdLower(userA, userB)) {
             return ChatRoom.builder()
                     .userA(userA)
