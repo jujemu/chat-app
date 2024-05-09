@@ -1,6 +1,7 @@
 package com.chatapp.kakaka.domain.user.controller;
 
 import com.chatapp.kakaka.domain.user.User;
+import com.chatapp.kakaka.domain.user.service.LoginResponse;
 import com.chatapp.kakaka.domain.user.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -14,6 +15,7 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -33,14 +35,15 @@ class UserControllerTest {
     @Autowired
     ObjectMapper objectMapper;
 
-    @DisplayName("/create 로 유저를 생성할 수 있다.")
+    @DisplayName("/create 로 유저를 생성할 수 있고 응답으로 uuid 문자열을 받는다.")
     @Test
     void registerNewUser() throws Exception {
         // given
         String username = "test";
         RegisterUserRequest request = new RegisterUserRequest(username);
         User user = createUser(username);
-        given(userService.register(any())).willReturn(user);
+        LoginResponse response = new LoginResponse(user);
+        given(userService.login(any())).willReturn(response);
 
         // when
         ResultActions perform = mockMvc.perform(
@@ -50,6 +53,7 @@ class UserControllerTest {
         );
 
         // then
+        verify(userService).login(any());
         perform
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").exists());
@@ -62,7 +66,8 @@ class UserControllerTest {
         String username = "";
         RegisterUserRequest request = new RegisterUserRequest(username);
         User user = createUser(username);
-        given(userService.register(request)).willReturn(user);
+        LoginResponse response = new LoginResponse(user);
+        given(userService.login(any())).willReturn(response);
 
         // when
         ResultActions perform = mockMvc.perform(
