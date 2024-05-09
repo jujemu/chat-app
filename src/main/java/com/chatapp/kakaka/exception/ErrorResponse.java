@@ -1,4 +1,4 @@
-package com.chatapp.kakaka.config.exception;
+package com.chatapp.kakaka.exception;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
