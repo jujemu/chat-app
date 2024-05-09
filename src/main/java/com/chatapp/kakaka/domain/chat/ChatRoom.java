@@ -1,7 +1,9 @@
 package com.chatapp.kakaka.domain.chat;
 
+import com.chatapp.kakaka.domain.BaseEntity;
 import com.chatapp.kakaka.domain.user.User;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @Entity
-public class ChatRoom {
+public class ChatRoom extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,7 +24,7 @@ public class ChatRoom {
     @ManyToOne(fetch = FetchType.LAZY)
     private User userB;
 
-    @Builder
+    @Builder(access = AccessLevel.PRIVATE)
     private ChatRoom(User userA, User userB) {
         this.userA = userA;
         this.userB = userB;
