@@ -31,12 +31,14 @@ class UserServiceTest {
         RegisterUserRequest request = new RegisterUserRequest(username);
 
         // when
-        User user = userService.register(request);
+        LoginResponse response = userService.login(request);
 
         // then
+        User user = response.getUser();
         assertThat(user.getId()).isNotNull();
         assertThat(user.getUsername()).isEqualTo(username);
         assertThat(user.getUuid()).isNotNull();
+        assertThat(response.isCreated()).isTrue();
     }
 
     @DisplayName("중복된 username 으로 가입할 수 없다.")
@@ -49,7 +51,7 @@ class UserServiceTest {
         RegisterUserRequest request = new RegisterUserRequest(username);
 
         // when // then
-        assertThatThrownBy(() -> userService.register(request))
+        assertThatThrownBy(() -> userService.login(request))
                 .isInstanceOf(RestApiException.class)
                 .satisfies(e ->
                         assertThat(((RestApiException) e).getErrorCode().getMessage())
