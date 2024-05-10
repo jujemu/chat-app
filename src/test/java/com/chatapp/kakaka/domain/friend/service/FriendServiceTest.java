@@ -75,12 +75,12 @@ class FriendServiceTest {
         friendService.sendRequest(myName, friendName);
 
         // then
-        Optional<Friend> friendByMe = friendRepository.findBySenderAndReceiver(me, friend);
+        Optional<Friend> friendByMe = friendRepository.findBySenderAndReceiver(myName, friendName);
         assertThat(friendByMe.isPresent()).isTrue();
         assertThat(friendByMe.get().getId()).isNotNull();
         assertThat(friendByMe.get().getStatus()).isEqualTo(FriendStatus.WAITING);
 
-        Optional<Friend> friendByFriend = friendRepository.findBySenderAndReceiver(friend, me);
+        Optional<Friend> friendByFriend = friendRepository.findBySenderAndReceiver(friendName, myName);
         assertThat(friendByFriend.isPresent()).isTrue();
         assertThat(friendByFriend.get().getId()).isNotNull();
         assertThat(friendByFriend.get().getStatus()).isEqualTo(FriendStatus.WAITING);

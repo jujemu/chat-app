@@ -1,6 +1,7 @@
 package com.chatapp.kakaka.domain.friend.service;
 
 import com.chatapp.kakaka.exception.RestApiException;
+import com.chatapp.kakaka.exception.errorcode.CommonErrorCode;
 import com.chatapp.kakaka.exception.errorcode.FriendErrorCode;
 import com.chatapp.kakaka.exception.errorcode.UserErrorCode;
 import com.chatapp.kakaka.domain.friend.Friend;
@@ -16,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+import static com.chatapp.kakaka.exception.errorcode.FriendErrorCode.REQUEST_NOT_EXISTS;
+
 @RequiredArgsConstructor
 @Transactional
 @Service
@@ -26,10 +29,15 @@ public class FriendService {
 
     @Transactional(readOnly = true)
     public FriendListResponse showAll(String myName) {
-        User me = getUser(myName);
-        List<Friend> myFriends = friendRepository.findAllBySender(me);
+        List<Friend> myFriends = friendRepository.findAllByUserAndStatus(myName, FriendStatus.ACCEPTED);
 
-        return FriendListResponse.of(me.getId(), myFriends);
+        return FriendListResponse.of(myName, myFriends);
+    }
+
+    @Transactional(readOnly = true)
+    public FriendListResponse showRequests(String myName) {
+        List<Friend> waitingRequests = friendRepository.findAllByUserAndStatus(myName, FriendStatus.WAITING);
+        return FriendListResponse.of(myName, waitingRequests);
     }
 
     /*
@@ -39,21 +47,50 @@ public class FriendService {
         User sender = getUser(myName);
         User receiver = getUser(receiverName);
 
-        cannotDuplicatedRequest(sender, receiver);
+        cannotDuplicatedRequest(sender.getUsername(), receiver.getUsername());
 
         List<Friend> friends = Friend.requestFriend(sender, receiver);
         friendRepository.saveAll(friends);
     }
 
-    private void cannotDuplicatedRequest(User sender, User receiver) {
-        Optional<Friend> optFriend = friendRepository.findBySenderAndReceiver(sender, receiver);
-        if (optFriend.isPresent() && optFriend.get().getStatus() != FriendStatus.DENIED) {
-            throw new RestApiException(FriendErrorCode.DUPLICATED_REQUEST);
-        }
+    public void acceptRequest(String myName, String receiverName) {
+        List<Friend> friendRequests = List.of(
+                getFriendRequested(myName, receiverName),
+                getFriendRequested(receiverName, myName)
+        );
+        if (friendRequests.stream().anyMatch(f ->
+                f.getStatus() != FriendStatus.WAITING))
+            throw new RestApiException(CommonErrorCode.INVALID_PARAMETER);
+
+        friendRequests.forEach(Friend::accepted);
+    }
+
+    public void denyRequest(String myName, String receiverName) {
+        List<Friend> friendRequests = List.of(
+                getFriendRequested(myName, receiverName),
+                getFriendRequested(receiverName, myName)
+        );
+        if (friendRequests.stream().anyMatch(f ->
+                f.getStatus() != FriendStatus.WAITING))
+            throw new RestApiException(CommonErrorCode.INVALID_PARAMETER);
+
+        friendRequests.forEach(Friend::denied);
     }
 
     private User getUser(String myName) {
         return userRepository.findUserByUsername(myName)
                 .orElseThrow(() -> new RestApiException(UserErrorCode.USER_NOT_FOUND));
+    }
+
+    private void cannotDuplicatedRequest(String senderName, String receiverName) {
+        Optional<Friend> optFriend = friendRepository.findBySenderAndReceiver(senderName, receiverName);
+        if (optFriend.isPresent() && optFriend.get().getStatus() != FriendStatus.DENIED) {
+            throw new RestApiException(FriendErrorCode.DUPLICATED_REQUEST);
+        }
+    }
+
+    private Friend getFriendRequested(String myName, String receiverName) {
+        return friendRepository.findBySenderAndReceiver(myName, receiverName)
+                .orElseThrow(() -> new RestApiException(REQUEST_NOT_EXISTS));
     }
 }

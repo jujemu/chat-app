@@ -10,7 +10,8 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 @RequiredArgsConstructor
 public enum FriendErrorCode implements ErrorCode{
 
-    DUPLICATED_REQUEST(BAD_REQUEST, "Friend request already exists.");
+    DUPLICATED_REQUEST(BAD_REQUEST, "Friend request already exists."),
+    REQUEST_NOT_EXISTS(BAD_REQUEST, "The request doesn't exist.");
 
     private final HttpStatus httpStatus;
     private final String message;

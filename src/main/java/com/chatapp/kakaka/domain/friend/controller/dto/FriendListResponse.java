@@ -11,16 +11,17 @@ import java.util.List;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class FriendListResponse {
 
-    private Long myId;
+    private String myName;
     private List<FriendResponse> friends;
 
-    public static FriendListResponse of(Long myId, List<Friend> friends) {
+    public static FriendListResponse of(String myName, List<Friend> friends) {
         List<FriendResponse> response = friends.stream()
                 .map(friend ->
                         new FriendResponse(
                                 friend.getId(),
-                                friend.getReceiver().getUsername())
+                                friend.getReceiver().getUsername(),
+                                friend.getType())
                 ).toList();
-        return new FriendListResponse(myId, response);
+        return new FriendListResponse(myName, response);
     }
 }

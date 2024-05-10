@@ -19,8 +19,23 @@ public class FriendController {
         return friendService.showAll(myName);
     }
 
+    @GetMapping("/friend/request/all/{myName}")
+    public FriendListResponse showRequests(@PathVariable String myName) {
+        return friendService.showRequests(myName);
+    }
+
     @PostMapping("/friend/request/{myName}/{receiverName}")
     public void sendRequest(@PathVariable String myName, @PathVariable String receiverName) {
         friendService.sendRequest(myName, receiverName);
+    }
+
+    @PostMapping("/friend/request/accept/{myName}/{receiverName}")
+    public void acceptRequest(@PathVariable String myName, @PathVariable String receiverName) {
+        friendService.acceptRequest(myName, receiverName);
+    }
+
+    @PostMapping("/friend/request/deny/{myName}/{receiverName}")
+    public void denyRequest(@PathVariable String myName, @PathVariable String receiverName) {
+        friendService.denyRequest(myName, receiverName);
     }
 }
