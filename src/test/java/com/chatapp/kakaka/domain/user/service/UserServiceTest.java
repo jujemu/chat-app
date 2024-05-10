@@ -1,5 +1,6 @@
 package com.chatapp.kakaka.domain.user.service;
 
+import com.chatapp.kakaka.domain.friend.FriendStatus;
 import com.chatapp.kakaka.exception.RestApiException;
 import com.chatapp.kakaka.domain.friend.Friend;
 import com.chatapp.kakaka.domain.friend.repository.FriendRepository;
@@ -63,12 +64,10 @@ class UserServiceTest {
         );
 
         // when
-        LoginResponse response = userService.login(request);
+        userService.login(request);
 
         // then
-        User user = response.getUser();
-        List<Friend> plusFriends = friendRepository.findAllBySender(user);
-
+        List<Friend> plusFriends = friendRepository.findAllByUserAndStatus(username, FriendStatus.ACCEPTED);
         assertThat(plusFriends).hasSize(3);
         plusFriends.forEach(
                 friend ->

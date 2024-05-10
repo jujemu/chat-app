@@ -30,7 +30,6 @@ public class FriendService {
     @Transactional(readOnly = true)
     public FriendListResponse showAll(String myName) {
         List<Friend> myFriends = friendRepository.findAllByUserAndStatus(myName, FriendStatus.ACCEPTED);
-
         return FriendListResponse.of(myName, myFriends);
     }
 

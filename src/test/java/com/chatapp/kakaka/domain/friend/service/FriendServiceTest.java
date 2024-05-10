@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -52,10 +53,36 @@ class FriendServiceTest {
         FriendListResponse response = friendService.showAll(myName);
 
         // then
-        assertThat(response.getMyId()).isNotNull();
         assertThat(response.getFriends()).hasSize(3)
-                .extracting("yours")
+                .extracting("otherName")
                 .containsExactly("friend1", "friend2", "friend3");
+        response.getFriends().forEach(f ->
+                assertThat(f.getId()).isNotNull()
+        );
+    }
+
+    @DisplayName("친구 요청 목록을 조회한다.")
+    @Test
+    void showRequests() throws Exception {
+        // given
+        String myName = "test";
+        User user = User.createUser(myName, "test uuid");
+        User friend1 = User.createPlusUser("friend1", "test uuid");
+        User friend2 = User.createPlusUser("friend2", "test uuid");
+        userRepository.saveAll(List.of(user, friend1, friend2));
+
+        List<Friend> friends = Stream.of(friend1, friend2).flatMap(f ->
+                        Friend.requestFriend(user, f).stream())
+                .toList();
+        friendRepository.saveAll(friends);
+
+        // when
+        FriendListResponse response = friendService.showRequests(myName);
+
+        // then
+        assertThat(response.getFriends()).hasSize(2)
+                .extracting("otherName")
+                .containsExactly("friend1", "friend2");
         response.getFriends().forEach(f ->
                 assertThat(f.getId()).isNotNull()
         );
