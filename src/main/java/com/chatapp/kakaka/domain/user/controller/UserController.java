@@ -23,6 +23,11 @@ public class UserController {
         userService.registerUser(username, password);
     }
 
+    /*
+        index.html 로그인 폼을 사용하여 로그인한다.
+        기존에 없던 아이디로 접근하면 자동으로 회원가입을 진행한다.
+        이미 등록되어있는 아이디로 접근하면 비밀번호를 대조한다.
+     */
     @GetMapping("/login")
     public void login() {}
 }
