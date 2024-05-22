@@ -7,17 +7,21 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(controllers = FriendController.class)
+@WebMvcTest(
+        controllers = FriendController.class
+)
 class FriendControllerTest {
 
     @Autowired
@@ -32,7 +36,8 @@ class FriendControllerTest {
     @Autowired
     ObjectMapper objectMapper;
 
-    @DisplayName("/friend/all/{myName} 으로 접근하면 내 친구 목록을 조회할 수 있다.")
+    @DisplayName("내 친구 목록을 조회할 수 있다.")
+    @WithMockUser
     @Test
     void showAll() throws Exception {
         // given
@@ -49,7 +54,8 @@ class FriendControllerTest {
         perform.andExpect(status().isOk());
     }
 
-    @DisplayName("/friend/request/{myName}/ 으로 접근하면 내 친구 목록을 조회할 수 있다.")
+    @DisplayName("친구 요청을 보낼 수 있다.")
+    @WithMockUser
     @Test
     void sendRequest() throws Exception {
         // given
@@ -59,6 +65,7 @@ class FriendControllerTest {
         // when
         ResultActions perform = mockMvc.perform(
                 post("/friend/request/" + myName + "/" + receiverName)
+                        .with(csrf())
         );
 
         // then

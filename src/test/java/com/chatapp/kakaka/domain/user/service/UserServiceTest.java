@@ -1,12 +1,11 @@
 package com.chatapp.kakaka.domain.user.service;
 
-import com.chatapp.kakaka.domain.friend.FriendStatus;
-import com.chatapp.kakaka.exception.RestApiException;
 import com.chatapp.kakaka.domain.friend.Friend;
+import com.chatapp.kakaka.domain.friend.FriendStatus;
 import com.chatapp.kakaka.domain.friend.repository.FriendRepository;
 import com.chatapp.kakaka.domain.user.User;
-import com.chatapp.kakaka.domain.user.controller.RegisterUserRequest;
 import com.chatapp.kakaka.domain.user.repository.UserRepository;
+import com.chatapp.kakaka.exception.RestApiException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,17 +35,17 @@ class UserServiceTest {
     void register() throws Exception {
         // given
         String username = "test";
-        RegisterUserRequest request = new RegisterUserRequest(username);
+        String password = "test password";
 
         // when
-        LoginResponse response = userService.login(request);
+        userService.registerUser(username, password);
 
         // then
-        User user = response.getUser();
+        User user = userRepository.findUserByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("테스트 오류"));
         assertThat(user.getId()).isNotNull();
         assertThat(user.getUsername()).isEqualTo(username);
-        assertThat(user.getUuid()).isNotNull();
-        assertThat(response.isCreated()).isTrue();
+        assertThat(user.getPassword()).isNotNull();
     }
 
     @DisplayName("회원가입을 하면 초기 플러스 친구가 자동으로 추가된다.")
@@ -54,7 +53,7 @@ class UserServiceTest {
     void registerWithPlusFriend() throws Exception {
         // given
         String username = "test";
-        RegisterUserRequest request = new RegisterUserRequest(username);
+        String password = "test password";
 
         User plus1 = createPlusUser("plus1");
         User plus2 = createPlusUser("plus2");
@@ -64,7 +63,7 @@ class UserServiceTest {
         );
 
         // when
-        userService.login(request);
+        userService.registerUser(username, password);
 
         // then
         List<Friend> plusFriends = friendRepository.findAllByUserAndStatus(username, FriendStatus.ACCEPTED);
@@ -80,12 +79,12 @@ class UserServiceTest {
     void cannot_register_when_username_duplicated() throws Exception {
         // given
         String username = "test";
-        User originalUser = User.createUser(username, "test uuid");
+        String password = "test password";
+        User originalUser = User.createUser(username, password);
         userRepository.save(originalUser);
-        RegisterUserRequest request = new RegisterUserRequest(username);
 
         // when // then
-        assertThatThrownBy(() -> userService.login(request))
+        assertThatThrownBy(() -> userService.registerUser(username, password))
                 .isInstanceOf(RestApiException.class)
                 .satisfies(e ->
                         assertThat(((RestApiException) e).getErrorCode().getMessage())
