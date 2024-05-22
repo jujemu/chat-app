@@ -63,7 +63,9 @@ public class User extends BaseEntity {
         return org.springframework.security.core.userdetails.User.builder()
                 .username(username)
                 .password(password)
-                .authorities(String.valueOf(role))
+                .authorities(List.of(() ->
+                        String.valueOf(role))
+                )
                 .build();
     }
 

@@ -22,4 +22,7 @@ public class UserController {
         String password = request.getPassword();
         userService.registerUser(username, password);
     }
+
+    @GetMapping("/login")
+    public void login() {}
 }

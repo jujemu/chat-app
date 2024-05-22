@@ -10,9 +10,24 @@
 <body class="p-4">
 <!-- 로그인 페이지 -->
 <div class="login-page login-container">
-    <div id="alert-container">
-        <div id="alert" class="hidden"></div>
+    <!-- 인증 실패 시 알림창 모달 -->
+    <div id="alert-modal" class="modal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-danger">에러</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>아이디가 중복되었거나 비밀번호가 틀렸습니다.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
     </div>
+    <!-- 로그인 폼 -->
     <h2 >Chat</h2>
     <div id="form-container">
         <form id="loginForm" action="/login" method="post">

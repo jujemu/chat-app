@@ -1,4 +1,5 @@
-let username = null;
+let usernameGlobal = null;
+let passwordGlobal = null;
 
 function registerAndLogin() {
     return async function (event) {
@@ -39,21 +40,22 @@ function registerUser(username, password) {
 
 function login(username, password) {
     fetch("/login", {
-        method: 'POST',
+        method: 'GET',
         headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: "username=" + encodeURIComponent(username) + "&password=" + encodeURIComponent(password)
+            'Authorization': "Basic " +
+                btoa(username + ":" + password)
+        }
     })
         .then(response => {
             if (response.ok) {
+                usernameGlobal = username
+                passwordGlobal = password
                 document.querySelector('.login-page').classList.add('hidden');
                 document.querySelector('.chat-page').classList.remove('hidden');
                 chatPage();
-            } else if (response.status === 401) {
-                let loginFailAlert = document.getElementById("alert");
-                loginFailAlert.classList.remove("hidden");
-                loginFailAlert.textContent = "비밀번호 오류";
+            } else {
+                var myModal = new bootstrap.Modal(document.getElementById('alert-modal'));
+                myModal.show();
             }
         })
         .catch(error =>
