@@ -9,6 +9,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.List;
 
@@ -24,7 +25,7 @@ public class User extends BaseEntity {
     @NotBlank
     @Column(unique = true, nullable = false)
     private String username;
-    private String uuid;
+    private String password;
 
     @Enumerated(EnumType.STRING)
     private UserRole role;
@@ -36,37 +37,45 @@ public class User extends BaseEntity {
     private List<Friend> myFriends;
 
     @Builder(access = AccessLevel.PRIVATE)
-    private User(String username, String uuid, UserRole role) {
+    private User(String username, String password, UserRole role) {
         this.username = username;
-        this.uuid = uuid;
+        this.password = password;
         this.role = role;
     }
 
-    public static User createUser(String username, String uuid) {
+    public static User createUser(String username, String password) {
         return User.builder()
                 .username(username)
-                .uuid(uuid)
+                .password(password)
                 .role(UserRole.USER)
                 .build();
     }
 
-    public static User createPlusUser(String username, String uuid) {
+    public static User createPlusUser(String username, String password) {
         return User.builder()
                 .username(username)
-                .uuid(uuid)
+                .password(password)
                 .role(UserRole.PLUS)
+                .build();
+    }
+
+    public UserDetails getUserDetails() {
+        return org.springframework.security.core.userdetails.User.builder()
+                .username(username)
+                .password(password)
+                .authorities(String.valueOf(role))
                 .build();
     }
 
     /**
      * only for test
      */
-    protected static User createWithId(Long id, String username) {
-        return new User(id, username);
-    }
-
     private User(Long id, String username) {
         this.id = id;
         this.username = username;
+    }
+
+    protected static User createWithId(Long id, String username) {
+        return new User(id, username);
     }
 }

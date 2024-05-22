@@ -1,7 +1,7 @@
 package com.chatapp.kakaka.domain.user.controller;
 
+import com.chatapp.kakaka.config.security.SecurityConfig;
 import com.chatapp.kakaka.domain.user.User;
-import com.chatapp.kakaka.domain.user.service.LoginResponse;
 import com.chatapp.kakaka.domain.user.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -9,18 +9,25 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(controllers = UserController.class)
+@WebMvcTest(
+        controllers = UserController.class,
+        includeFilters = {
+                @ComponentScan.Filter(
+                        type = FilterType.ASSIGNABLE_TYPE,
+                        classes = SecurityConfig.class)}
+)
 class UserControllerTest {
 
     @Autowired
@@ -35,28 +42,26 @@ class UserControllerTest {
     @Autowired
     ObjectMapper objectMapper;
 
-    @DisplayName("/create 로 유저를 생성할 수 있고 응답으로 uuid 문자열을 받는다.")
+    @DisplayName("/create 로 유저를 생성할 수 있다.")
     @Test
-    void registerNewUser() throws Exception {
+    void registerUser() throws Exception {
         // given
         String username = "test";
-        RegisterUserRequest request = new RegisterUserRequest(username);
-        User user = createUser(username);
-        LoginResponse response = new LoginResponse(user);
-        given(userService.login(any())).willReturn(response);
+        String password = "test password";
+        RegisterUserRequest request = new RegisterUserRequest(username, password);
 
         // when
         ResultActions perform = mockMvc.perform(
                 post("/create")
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf())
         );
 
         // then
-        verify(userService).login(any());
+        verify(userService).registerUser(username, password);
         perform
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").exists());
+                .andExpect(status().isOk());
     }
 
     @DisplayName("비어있는 이름으로 유저를 생성할 수 없다.")
@@ -64,10 +69,7 @@ class UserControllerTest {
     void cannot_register_new_user_when_blank_username() throws Exception {
         // given
         String username = "";
-        RegisterUserRequest request = new RegisterUserRequest(username);
-        User user = createUser(username);
-        LoginResponse response = new LoginResponse(user);
-        given(userService.login(any())).willReturn(response);
+        RegisterUserRequest request = getRegisterUserRequest(username);
 
         // when
         ResultActions perform = mockMvc.perform(
@@ -84,5 +86,10 @@ class UserControllerTest {
 
     private User createUser(String username) {
         return User.createUser(username, "test uuid");
+    }
+
+    private RegisterUserRequest getRegisterUserRequest(String username) {
+        String password = "test password";
+        return new RegisterUserRequest(username, password);
     }
 }

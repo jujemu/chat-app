@@ -19,7 +19,7 @@ class UserTest {
 
         // then
         assertThat(user.getUsername()).isEqualTo(username);
-        assertThat(user.getUuid()).isEqualTo(uuid);
+        assertThat(user.getPassword()).isEqualTo(uuid);
         assertThat(user.getRole()).isEqualTo(UserRole.USER);
     }
 
@@ -35,7 +35,7 @@ class UserTest {
 
         // then
         assertThat(user.getUsername()).isEqualTo(username);
-        assertThat(user.getUuid()).isEqualTo(uuid);
+        assertThat(user.getPassword()).isEqualTo(uuid);
         assertThat(user.getRole()).isEqualTo(UserRole.PLUS);
     }
 }

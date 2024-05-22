@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Chat app</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="css/main.css" rel="stylesheet">
+</head>
+<body class="p-4">
+<!-- 로그인 페이지 -->
+<div class="login-page login-container">
+    <div id="alert-container">
+        <div id="alert" class="hidden"></div>
+    </div>
+    <h2 >Chat</h2>
+    <div id="form-container">
+        <form id="loginForm" action="/login" method="post">
+            <input type="text" id="username" placeholder="Username" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <div id="login-btn">
+                <button type="submit">Login</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 채팅 페이지 -->
+<div class="chat-page container hidden">
+    <div class="row white-container navbar p-3" style="max-width: 1800px">
+        <div class="col-9">
+            <h3 class="text-start mb-0">Chat</h3>
+        </div>
+        <div class="container col-3 d-flex justify-content-end">
+            <div class="text-end p-2">
+                <a href="/logout">Sign out</a>
+            </div>
+            <div class="text-end p-2 border-start d-none d-lg-block">
+                <a href="https://github.com/jujemu/chat-app" class="text-muted" target="_blank">Github Link</a>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-4 white-container p-4">
+            <div class="container border-bottom">
+                <h4>Friends</h4>
+            </div>
+            <ul class="friends">
+            </ul>
+        </div>
+        <div class="col-1"></div>
+        <div class="col-7 white-container p-4">
+            <div class="container border-bottom">
+                <h4>Chats</h4>
+            </div>
+            <ul class="friends">
+            </ul>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
