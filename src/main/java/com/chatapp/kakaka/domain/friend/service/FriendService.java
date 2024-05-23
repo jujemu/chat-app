@@ -46,6 +46,7 @@ public class FriendService {
         User sender = getUser(myName);
         User receiver = getUser(receiverName);
 
+        cannotRequestMyself(sender.getUsername(), receiver.getUsername());
         cannotDuplicatedRequest(sender.getUsername(), receiver.getUsername());
 
         List<Friend> friends = Friend.requestFriend(sender, receiver);
@@ -91,5 +92,10 @@ public class FriendService {
     private Friend getFriendRequested(String myName, String receiverName) {
         return friendRepository.findBySenderAndReceiver(myName, receiverName)
                 .orElseThrow(() -> new RestApiException(REQUEST_NOT_EXISTS));
+    }
+
+    private void cannotRequestMyself(String myName, String receiverName) {
+        if (myName == null || receiverName == null || myName.equals(receiverName))
+            throw new RestApiException(CommonErrorCode.INVALID_PARAMETER);
     }
 }
