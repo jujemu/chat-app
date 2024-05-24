@@ -46,9 +46,18 @@ public class FriendService {
         User sender = getUser(myName);
         User receiver = getUser(receiverName);
 
+        Optional<Friend> optFriend = friendRepository.findBySenderAndReceiver(myName, receiverName);
         cannotRequestMyself(sender.getUsername(), receiver.getUsername());
-        cannotDuplicatedRequest(sender.getUsername(), receiver.getUsername());
-        cannotRequestFriend(sender.getUsername(), receiver.getUsername());
+        cannotDuplicatedRequest(optFriend);
+        cannotRequestFriend(optFriend);
+
+        if (optFriend.isPresent() && optFriend.get().getStatus().equals(FriendStatus.DENIED)) {
+            Friend friend = optFriend.get();
+            Friend friendReverse = friendRepository.findBySenderAndReceiver(receiverName, myName).orElseThrow();
+            friend.reRequestedSender();
+            friendReverse.reRequestedReceiver();
+            return;
+        }
 
         List<Friend> friends = Friend.requestFriend(sender, receiver);
         friendRepository.saveAll(friends);
@@ -69,8 +78,7 @@ public class FriendService {
                 .orElseThrow(() -> new RestApiException(UserErrorCode.USER_NOT_FOUND));
     }
 
-    private void cannotDuplicatedRequest(String senderName, String receiverName) {
-        Optional<Friend> optFriend = friendRepository.findBySenderAndReceiver(senderName, receiverName);
+    private void cannotDuplicatedRequest(Optional<Friend> optFriend) {
         if (optFriend.isPresent() && optFriend.get().getStatus() != FriendStatus.DENIED) {
             throw new RestApiException(FriendErrorCode.DUPLICATED_REQUEST);
         }
@@ -97,9 +105,8 @@ public class FriendService {
         return friendRequests;
     }
 
-    private void cannotRequestFriend(String myName, String receiverName) {
-        Optional<Friend> opt = friendRepository.findBySenderAndReceiver(myName, receiverName);
-        if (opt.isPresent() && opt.get().getStatus().equals(FriendStatus.ACCEPTED))
+    private void cannotRequestFriend(Optional<Friend> optFriend) {
+        if (optFriend.isPresent() && optFriend.get().getStatus().equals(FriendStatus.ACCEPTED))
             throw new RestApiException(CommonErrorCode.INVALID_PARAMETER);
     }
 }

@@ -89,4 +89,16 @@ public class Friend extends BaseEntity {
             throw new IllegalArgumentException("This request is already processed.");
         this.status = FriendStatus.DENIED;
     }
+
+    public void reRequestedSender() {
+        if (this.status != FriendStatus.DENIED)
+            throw new IllegalArgumentException("Invalid.");
+        this.status = FriendStatus.WAITING;
+    }
+
+    public void reRequestedReceiver() {
+        if (this.status != FriendStatus.DENIED)
+            throw new IllegalArgumentException("Invalid.");
+        this.status = FriendStatus.REQUESTED;
+    }
 }

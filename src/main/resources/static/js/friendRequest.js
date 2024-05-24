@@ -133,9 +133,8 @@ function getFriendRequestListConnect() {
     const url = "/friend/requests/connect" + `?myName=${usernameGlobal}`;
     const sse = new EventSource(url);
 
-    sse.addEventListener('connect', (e) => {
+    sse.addEventListener('friendRequest', (e) => {
         const { data: requestUserName } = e;
-        if (requestUserName.substring(0, 6) === "ignore") return;
         const data = {
             friends: [{
                 type: "NORMAL",
@@ -143,6 +142,17 @@ function getFriendRequestListConnect() {
             }]
         }
         getFriendRequestItem(data);
+    })
+
+    sse.addEventListener('requestAccept', (e) => {
+        const { data: username } = e;
+        const data = {
+            friends: [{
+                type: "NORMAL",
+                otherName: username
+            }]
+        }
+        getFriendItem(data);
     })
 }
 

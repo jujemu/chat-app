@@ -41,7 +41,7 @@ public class FriendController {
         if (myName == null || myName.isBlank())
             throw new RestApiException(CommonErrorCode.INVALID_PARAMETER);
 
-        SseEmitter sseEmitter = new SseEmitter(1000L * 30);
+        SseEmitter sseEmitter = new SseEmitter(1000L * 60);
         emitters.add(myName, sseEmitter);
         try {
             sseEmitter.send(SseEmitter.event()
@@ -57,13 +57,14 @@ public class FriendController {
     public void sendRequest(@PathVariable String myName, @PathVariable String receiverName, Authentication authentication) {
         isRequestFromMe(authentication.getPrincipal(), myName);
         friendService.sendRequest(myName, receiverName);
-        sendEventOfRequest(myName, receiverName);
+        sendEventOfRequest(myName, receiverName, "friendRequest");
     }
 
     @PostMapping("/friend/request/accept/{myName}/{receiverName}")
     public void acceptRequest(@PathVariable String myName, @PathVariable String receiverName, Authentication authentication) {
         isRequestFromMe(authentication.getPrincipal(), myName);
         friendService.acceptRequest(myName, receiverName);
+        sendEventOfRequest(myName, receiverName, "requestAccept");
     }
 
     @PostMapping("/friend/request/deny/{myName}/{receiverName}")
@@ -78,7 +79,7 @@ public class FriendController {
             throw new RestApiException(UserErrorCode.UNAUTHORIZED);
     }
 
-    private void sendEventOfRequest(String myName, String receiverName) {
+    private void sendEventOfRequest(String myName, String receiverName, String eventName) {
         try {
             Optional<SseEmittersWithUsername> optEmitter = emitters.getEmitters().stream()
                     .filter(e -> e.getUsername().equals(receiverName))
@@ -87,7 +88,7 @@ public class FriendController {
             SseEmitter emitter = optEmitter.get().getEmitter();
             emitter.send(
                     SseEmitter.event()
-                        .name("connect")
+                        .name(eventName)
                         .data(myName)
             );
         } catch (IOException e) {
