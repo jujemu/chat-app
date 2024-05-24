@@ -67,29 +67,33 @@ function getFriendsList() {
     })
         .then(response => response.json())
         .then(data => {
-            const userListElement = document.getElementById("friends");
-            data["friends"]
-                .sort((a, b) => a["otherName"].localeCompare(b["otherName"]))
-                .forEach(friend => {
-                    const name = friend["otherName"];
-                    const type = friend["type"];
-                    const listItem = document.createElement("li");
-                    listItem.textContent = name;
-                    if (type === "PLUS") {
-                        const badge = document.createElement("span");
-                        badge.className = "badge badge-pill";
-                        badge.style.backgroundColor = "#AC58FA";
-                        badge.textContent = "plus";
-                        listItem.appendChild(badge);
-                    }
-                    listItem.className = "list-group-item d-flex justify-content-between align-items-center";
-                    userListElement.appendChild(listItem);
-                });
-            selected('friends');
+            getFriendItem(data);
         })
         .catch(error => {
             console.error("Error fetching user list:", error);
         });
+}
+
+function getFriendItem(data) {
+    const userListElement = document.getElementById("friends");
+    data["friends"]
+        .sort((a, b) => a["otherName"].localeCompare(b["otherName"]))
+        .forEach(friend => {
+            const name = friend["otherName"];
+            const type = friend["type"];
+            const listItem = document.createElement("li");
+            listItem.textContent = name;
+            if (type === "PLUS") {
+                const badge = document.createElement("span");
+                badge.className = "badge badge-pill";
+                badge.style.backgroundColor = "#AC58FA";
+                badge.textContent = "plus";
+                listItem.appendChild(badge);
+            }
+            listItem.className = "list-group-item d-flex justify-content-between align-items-center";
+            userListElement.appendChild(listItem);
+        });
+    selected('friends');
 }
 
 function getFriendsRequest() {
@@ -164,6 +168,15 @@ function requestEventHandler(acceptOrDeny, listItem) {
         })
             .then(() => {
                 listItem.remove();
+                if (acceptOrDeny === "accept") {
+                    const data = {
+                        friends: [{
+                            type: "NORMAL",
+                            otherName: receiveName
+                        }]
+                    }
+                    getFriendItem(data)
+                }
             })
             .catch(error => {
                 console.error('There was a problem with the fetch operation:', error);

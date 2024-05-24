@@ -4,4 +4,11 @@ function chatPage() {
     getFriendsRequest();
 }
 
+function getFriendListConnect() {
+    const url = "/friend/requests/connect";
+    const sse = new EventSource(url);
 
+    sse.addEventListener('connect', (e) => {
+        const { data: receivedConnectData } = e;
+    })
+}
