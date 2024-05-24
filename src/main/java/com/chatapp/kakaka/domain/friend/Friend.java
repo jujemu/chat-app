@@ -55,7 +55,7 @@ public class Friend extends BaseEntity {
                 .build();
 
         Friend friend2 = Friend.builder()
-                .status(FriendStatus.WAITING)
+                .status(FriendStatus.REQUESTED)
                 .type(FriendType.NORMAL)
                 .sender(friend)
                 .receiver(me)
@@ -73,19 +73,19 @@ public class Friend extends BaseEntity {
         return Friend.builder()
                 .status(FriendStatus.ACCEPTED)
                 .type(FriendType.PLUS)
-                .sender(me)
-                .receiver(plus)
+                .sender(plus)
+                .receiver(me)
                 .build();
     }
 
     public void accepted() {
-        if (this.status != FriendStatus.WAITING)
+        if (this.status != FriendStatus.WAITING && this.status != FriendStatus.REQUESTED)
             throw new IllegalArgumentException("This request is already processed.");
         this.status = FriendStatus.ACCEPTED;
     }
 
     public void denied() {
-        if (this.status != FriendStatus.WAITING)
+        if (this.status != FriendStatus.WAITING && this.status != FriendStatus.REQUESTED)
             throw new IllegalArgumentException("This request is already processed.");
         this.status = FriendStatus.DENIED;
     }

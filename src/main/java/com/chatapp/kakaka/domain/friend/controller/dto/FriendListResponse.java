@@ -19,7 +19,7 @@ public class FriendListResponse {
                 .map(friend ->
                         new FriendResponse(
                                 friend.getId(),
-                                friend.getReceiver().getUsername(),
+                                friend.getSender().getUsername(),
                                 friend.getType())
                 ).toList();
         return new FriendListResponse(myName, response);

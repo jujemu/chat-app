@@ -66,7 +66,7 @@ class UserServiceTest {
         userService.registerUser(username, password);
 
         // then
-        List<Friend> plusFriends = friendRepository.findAllByUserAndStatus(username, FriendStatus.ACCEPTED);
+        List<Friend> plusFriends = friendRepository.findAllBySenderAndStatus(username, FriendStatus.ACCEPTED);
         assertThat(plusFriends).hasSize(3);
         plusFriends.forEach(
                 friend ->
