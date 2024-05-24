@@ -49,11 +49,12 @@
                     <h5 class="modal-title">추가하고 싶은 친구의 이름을 적으세요.</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form style="text-align: center">
+                <form style="text-align: center;">
                     <input id="friendRequestName" type="text" placeholder="Friend's name">
+                    <div id="friendRequest-warning" class="text-danger hidden" style="float:right;">없는 계정입니다.</div>
                 </form>
                 <div class="modal-footer">
-                    <button id="friendRequestModalBtn" type="button" class="btn btn-secondary bg-primary" data-bs-dismiss="modal">ok</button>
+                    <button id="friendRequestModalBtn" type="button" class="btn btn-secondary bg-primary">ok</button>
                 </div>
             </div>
         </div>
@@ -83,12 +84,17 @@
                 <ul id="friends" class="list-group">
                 </ul>
             </div>
+            <!-- 요청받은 친구 목록 -->
             <div class="container mt-3 border-top">
                 <ul id="friend-request mt-3" class="list-group">
                 </ul>
             </div>
         </div>
+
+        <!-- 빈칸 -->
         <div class="col-1"></div>
+
+        <!-- 채팅 목록 -->
         <div class="col-7 white-container p-4">
             <div class="container">
                 <h4>Chats</h4>

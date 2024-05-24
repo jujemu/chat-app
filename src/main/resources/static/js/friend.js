@@ -15,14 +15,17 @@ document.getElementById('friendRequest-btn')
     .addEventListener('submit', friendRequest_modalShow());
 
 function friendRequest_modalShow() {
-    return async function(event) {
+    return function(event) {
         event.preventDefault();
+        document.querySelector("#friendRequest-warning")
+            .classList.add("hidden");
         const modal = new bootstrap.Modal(document.getElementById('friendRequest-modal'));
         modal.show();
     }
 }
 
-function sendRequest() {
+function sendRequest(event) {
+    event.preventDefault();
     const friendName = document.getElementById('friendRequestName').value;
     const url = '/friend/request/' + usernameGlobal + '/' + friendName;
 
@@ -33,14 +36,22 @@ function sendRequest() {
             btoa(usernameGlobal + ":" + passwordGlobal)
         }
     })
+        .then(response => {
+            if (response.status === 404) {
+                document.querySelector("#friendRequest-warning")
+                    .classList.remove("hidden");
+            } else {
+                const modal = bootstrap.Modal.getInstance('#friendRequest-modal');
+                modal.hide();
+            }
+        })
         .catch(error => alert("Error occurs."));
 }
 
 document.querySelector("#friendRequest-modal")
     .addEventListener('keypress', (event) => {
         if (event.key === 'Enter') {
-            event.preventDefault();
-            sendRequest();
+            sendRequest(event);
         }
 });
 
