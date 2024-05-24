@@ -22,7 +22,7 @@ public class SseEmitters {
         log.info("emitter list size: {}", emitters.size());
         emitter.onCompletion(() -> {
             log.info("onCompletion callback");
-            this.emitters.remove(emitter);
+            this.emitters.remove(sseEmittersWithUsername);
         });
         emitter.onTimeout(() -> {
             log.info("onTimeout callback");

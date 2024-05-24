@@ -37,12 +37,19 @@ public class FriendController {
     }
 
     @GetMapping(value = "/friend/requests/connect", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter connectRequest(@RequestParam() String myName) {
+    public SseEmitter connectRequest(@RequestParam String myName) {
         if (myName == null || myName.isBlank())
             throw new RestApiException(CommonErrorCode.INVALID_PARAMETER);
 
-        SseEmitter sseEmitter = new SseEmitter();
+        SseEmitter sseEmitter = new SseEmitter(1000L * 30);
         emitters.add(myName, sseEmitter);
+        try {
+            sseEmitter.send(SseEmitter.event()
+                    .name("connect")
+                    .data("ignore:connected!"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         return sseEmitter;
     }
 

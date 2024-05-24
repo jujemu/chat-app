@@ -59,7 +59,7 @@ function login(username, password) {
             }
         })
         .catch(error =>
-            alert("error occurs in login")
+            alert("error occurs in login.")
         );
 }
 
