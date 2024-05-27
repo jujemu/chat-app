@@ -7,7 +7,16 @@ function chatPage() {
     getFriendRequestListConnect();
 }
 
+function selectFriendItem(li) {
+    const items = document.getElementById("friends").getElementsByTagName('li');
+    for (let i = 0; i < items.length; i++) {
+        items[i].classList.remove('active-friend');
+    }
+    li.classList.add('active-friend');
+}
+
 function getChatRoomId(event) {
+    selectFriendItem(event.currentTarget);
     let friendName = "";
     event.currentTarget.childNodes.forEach(node => {
         if (node.nodeType === Node.TEXT_NODE) friendName += node.textContent;
@@ -93,13 +102,11 @@ function addChatItem(chat) {
     createdAt.className = "container-fluid";
 
     if (chat["type"] === "CONNECTED") {
-        return;
-        content.className = "chat-connected text-center";
-        content.textContent = `${chat["sender"]}이 입장했습니다.`;
+        // content.className = "chat-connected text-center";
+        // content.textContent = `${chat["sender"]}이 입장했습니다.`;
     } else if (chat["type"] === "DISCONNECTED") {
-        return;
-        div.className = "chat-connected text-center";
-        div.textContent = `${chat["sender"]}이 퇴장했습니다.`;
+        // div.className = "chat-connected text-center";
+        // div.textContent = `${chat["sender"]}이 퇴장했습니다.`;
     } else {
         const profileContainer = document.createElement("div");
         profileContainer.className = "col-1 p-0";
@@ -130,7 +137,10 @@ function addChatItem(chat) {
 }
 
 function chatPush() {
-    if (chatRoomId === null) return;
+    if (chatRoomId === null) {
+        alert("먼저 대화를 하고 싶은 친구를 선택하세요.");
+        return;
+    }
     const message = document.getElementById("chat-message").value;
     const body = {
         sender: usernameGlobal,

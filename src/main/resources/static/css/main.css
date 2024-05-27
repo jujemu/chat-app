@@ -152,3 +152,7 @@ button:hover {
     height: 600px;
     width: 600px;
 }
+
+.active-friend {
+    background-color: antiquewhite;
+}

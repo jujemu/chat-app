@@ -170,11 +170,11 @@
         createdAt.className = "container-fluid";
 
         if (message.headers["type"] === "CONNECTED") {
-            content.className = "chat-connected text-center";
-            content.textContent = `${message.headers["sender"]}이 입장했습니다.`;
+            // content.className = "chat-connected text-center";
+            // content.textContent = `${message.headers["sender"]}이 입장했습니다.`;
         } else if (message.headers["type"] === "DISCONNECTED") {
-            div.className = "chat-connected text-center";
-            div.textContent = `${message.headers["sender"]}이 퇴장했습니다.`;
+            // div.className = "chat-connected text-center";
+            // div.textContent = `${message.headers["sender"]}이 퇴장했습니다.`;
         } else {
             const profileContainer = document.createElement("div");
             profileContainer.className = "col-1 p-0";
