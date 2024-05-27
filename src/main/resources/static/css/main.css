@@ -36,10 +36,6 @@ h2 {
     color: #333;
 }
 
-.input-group {
-    margin-bottom: 20px;
-}
-
 label {
     display: block;
     margin-bottom: 5px;
@@ -127,4 +123,36 @@ button:hover {
 
 .navbar a {
     text-decoration: none;
+}
+
+.chat-item {
+    background-color: burlywood;
+}
+
+.cursor {
+    cursor: pointer;
+}
+
+.chat-connected {
+    background-color: darkgrey;
+    color: white;
+}
+
+.chat-container-box {
+    height: 500px;
+    background-color: #cccccc;
+}
+
+.chat-timestamp {
+    color: white;
+}
+
+.chat-container {
+    background-color: gainsboro;
+    height: 600px;
+    width: 600px;
+}
+
+.active-friend {
+    background-color: antiquewhite;
 }

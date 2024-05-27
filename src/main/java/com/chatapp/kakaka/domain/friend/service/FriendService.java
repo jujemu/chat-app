@@ -29,13 +29,13 @@ public class FriendService {
 
     @Transactional(readOnly = true)
     public FriendListResponse showAll(String myName) {
-        List<Friend> myFriends = friendRepository.findAllByUserAndStatus(myName, FriendStatus.ACCEPTED);
+        List<Friend> myFriends = friendRepository.findAllByReceiverAndStatus(myName, FriendStatus.ACCEPTED);
         return FriendListResponse.of(myName, myFriends);
     }
 
     @Transactional(readOnly = true)
     public FriendListResponse showRequests(String myName) {
-        List<Friend> waitingRequests = friendRepository.findAllByUserAndStatus(myName, FriendStatus.WAITING);
+        List<Friend> waitingRequests = friendRepository.findAllByReceiverAndStatus(myName, FriendStatus.WAITING);
         return FriendListResponse.of(myName, waitingRequests);
     }
 
@@ -46,33 +46,30 @@ public class FriendService {
         User sender = getUser(myName);
         User receiver = getUser(receiverName);
 
-        cannotDuplicatedRequest(sender.getUsername(), receiver.getUsername());
+        Optional<Friend> optFriend = friendRepository.findBySenderAndReceiver(myName, receiverName);
+        cannotRequestMyself(sender.getUsername(), receiver.getUsername());
+        cannotDuplicatedRequest(optFriend);
+        cannotRequestFriend(optFriend);
+
+        if (optFriend.isPresent() && optFriend.get().getStatus().equals(FriendStatus.DENIED)) {
+            Friend friend = optFriend.get();
+            Friend friendReverse = friendRepository.findBySenderAndReceiver(receiverName, myName).orElseThrow();
+            friend.reRequestedSender();
+            friendReverse.reRequestedReceiver();
+            return;
+        }
 
         List<Friend> friends = Friend.requestFriend(sender, receiver);
         friendRepository.saveAll(friends);
     }
 
     public void acceptRequest(String myName, String receiverName) {
-        List<Friend> friendRequests = List.of(
-                getFriendRequested(myName, receiverName),
-                getFriendRequested(receiverName, myName)
-        );
-        if (friendRequests.stream().anyMatch(f ->
-                f.getStatus() != FriendStatus.WAITING))
-            throw new RestApiException(CommonErrorCode.INVALID_PARAMETER);
-
+        List<Friend> friendRequests = getFriendRequests(myName, receiverName);
         friendRequests.forEach(Friend::accepted);
     }
 
     public void denyRequest(String myName, String receiverName) {
-        List<Friend> friendRequests = List.of(
-                getFriendRequested(myName, receiverName),
-                getFriendRequested(receiverName, myName)
-        );
-        if (friendRequests.stream().anyMatch(f ->
-                f.getStatus() != FriendStatus.WAITING))
-            throw new RestApiException(CommonErrorCode.INVALID_PARAMETER);
-
+        List<Friend> friendRequests = getFriendRequests(myName, receiverName);
         friendRequests.forEach(Friend::denied);
     }
 
@@ -81,8 +78,7 @@ public class FriendService {
                 .orElseThrow(() -> new RestApiException(UserErrorCode.USER_NOT_FOUND));
     }
 
-    private void cannotDuplicatedRequest(String senderName, String receiverName) {
-        Optional<Friend> optFriend = friendRepository.findBySenderAndReceiver(senderName, receiverName);
+    private void cannotDuplicatedRequest(Optional<Friend> optFriend) {
         if (optFriend.isPresent() && optFriend.get().getStatus() != FriendStatus.DENIED) {
             throw new RestApiException(FriendErrorCode.DUPLICATED_REQUEST);
         }
@@ -91,5 +87,26 @@ public class FriendService {
     private Friend getFriendRequested(String myName, String receiverName) {
         return friendRepository.findBySenderAndReceiver(myName, receiverName)
                 .orElseThrow(() -> new RestApiException(REQUEST_NOT_EXISTS));
+    }
+
+    private void cannotRequestMyself(String myName, String receiverName) {
+        if (myName == null || receiverName == null || myName.equals(receiverName))
+            throw new RestApiException(CommonErrorCode.INVALID_PARAMETER);
+    }
+
+    private List<Friend> getFriendRequests(String myName, String receiverName) {
+        List<Friend> friendRequests = List.of(
+                getFriendRequested(myName, receiverName),
+                getFriendRequested(receiverName, myName)
+        );
+        if (friendRequests.stream().anyMatch(f ->
+                f.getStatus() != FriendStatus.WAITING && f.getStatus() != FriendStatus.REQUESTED))
+            throw new RestApiException(CommonErrorCode.INVALID_PARAMETER);
+        return friendRequests;
+    }
+
+    private void cannotRequestFriend(Optional<Friend> optFriend) {
+        if (optFriend.isPresent() && optFriend.get().getStatus().equals(FriendStatus.ACCEPTED))
+            throw new RestApiException(CommonErrorCode.INVALID_PARAMETER);
     }
 }

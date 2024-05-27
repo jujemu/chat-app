@@ -4,7 +4,7 @@ let passwordGlobal = null;
 function registerAndLogin() {
     return async function (event) {
         event.preventDefault();
-        username = document.getElementById('username').value;
+        let username = document.getElementById('username').value;
         let password = document.getElementById('password').value;
         const response = await fetch(`/create/available?username=${username}`);
         const isNeededRegister = await response.text()
@@ -38,12 +38,15 @@ function registerUser(username, password) {
         });
 }
 
+function getAuth(username, password) {
+    return btoa(encodeURIComponent(username) + ":" + encodeURIComponent(password));
+}
+
 function login(username, password) {
     fetch("/login", {
         method: 'GET',
         headers: {
-            'Authorization': "Basic " +
-                btoa(username + ":" + password)
+            'Authorization': "Basic " + getAuth(username, password)
         }
     })
         .then(response => {
@@ -59,45 +62,9 @@ function login(username, password) {
             }
         })
         .catch(error =>
-            alert("error occurs in login")
+            alert("error occurs in login.")
         );
 }
 
 document.getElementById('loginForm')
     .addEventListener('submit', registerAndLogin());
-
-// -------------------------------  chat page  -------------------------------
-
-function chatPage() {
-    fetch("/users")
-        .then(response => response.json())
-        .then(data => {
-            // 받은 데이터를 사용하여 HTML 리스트를 만듭니다.
-            const userListElement = document.getElementById("userList");
-            data["usernames"].forEach(username => {
-                const listItem = document.createElement("li");
-                listItem.textContent = username;
-                userListElement.appendChild(listItem);
-            });
-        })
-        .catch(error => {
-            console.error("Error fetching user list:", error);
-        });
-}
-
-function participantsList() {
-    fetch("/users")
-        .then(response => response.json())
-        .then(data => {
-            // 받은 데이터를 사용하여 HTML 리스트를 만듭니다.
-            const userListElement = document.getElementById("userList");
-            data["usernames"].forEach(username => {
-                const listItem = document.createElement("li");
-                listItem.textContent = username;
-                userListElement.appendChild(listItem);
-            });
-        })
-        .catch(error => {
-            console.error("Error fetching user list:", error);
-        });
-}

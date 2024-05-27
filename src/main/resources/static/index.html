@@ -8,7 +8,7 @@
     <link href="css/main.css" rel="stylesheet">
 </head>
 <body class="p-4">
-<!-- 로그인 페이지 -->
+<!-- 로그인 페이지-->
 <div class="login-page login-container">
     <!-- 인증 실패 시 알림창 모달 -->
     <div id="alert-modal" class="modal" tabindex="-1">
@@ -42,9 +42,26 @@
 
 <!-- 채팅 페이지 -->
 <div class="chat-page container hidden">
+    <div id="friendRequest-modal" class="modal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">추가하고 싶은 친구의 이름을 적으세요.</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form style="text-align: center;">
+                    <input id="friendRequestName" type="text" placeholder="Friend's name">
+                    <div id="friendRequest-warning" class="text-danger hidden" style="float:right;">없는 계정입니다.</div>
+                </form>
+                <div class="modal-footer">
+                    <button id="friendRequestModalBtn" type="button" class="btn btn-secondary bg-primary">ok</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="row white-container navbar p-3" style="max-width: 1800px">
         <div class="col-9">
-            <h3 class="text-start mb-0">Chat</h3>
+            <h3 id="chat-main" class="text-start mb-0">Chat</h3>
         </div>
         <div class="container col-3 d-flex justify-content-end">
             <div class="text-end p-2">
@@ -57,25 +74,157 @@
     </div>
     <div class="row mt-4">
         <div class="col-4 white-container p-4">
-            <div class="container border-bottom">
+            <div class="container d-flex justify-content-between">
                 <h4>Friends</h4>
+                <form id="friendRequest-btn">
+                    <button style="font-size: 13px; padding: 5px 15px 5px 15px;" type="submit">친구 요청</button>
+                </form>
             </div>
-            <ul class="friends">
-            </ul>
+            <div class="container mt-3">
+                <ul id="friends" class="list-group">
+                </ul>
+            </div>
+            <!-- 요청받은 친구 목록 -->
+            <div class="container mt-3 border-top">
+                <h4 class="mt-4">Friend Request</h4>
+                <ul id="friend-request" class="list-group mt-3">
+                </ul>
+            </div>
         </div>
+
+        <!-- 빈칸 -->
         <div class="col-1"></div>
-        <div class="col-7 white-container p-4">
-            <div class="container border-bottom">
-                <h4>Chats</h4>
+
+        <!-- 채팅 목록 -->
+        <div class="col-7 white-container p-4 position-relative">
+            <div class="container">
+                <h4 id="chat-title">Chats</h4>
             </div>
-            <ul class="friends">
-            </ul>
+            <!-- 채팅 내용 -->
+            <div id="chat" class="container chat-container rounded mt-3" style="overflow: auto"></div>
+
+            <!-- 채팅 입력 창 -->
+            <div class="input-group mb-3 position-absolute bottom-0 justify-content-center" style="margin: auto">
+                <input id="chat-message" type="text" class="w-75" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+                <span id="chat-push" class="input-group-text mt-2 mb-2 cursor" >전송</span>
+            </div>
+            <div style="height: 60px"></div>
         </div>
     </div>
 </div>
+
+<!--
+    JSPM Generator Import Map
+    Edit URL: https://generator.jspm.io/#U2NgYGBkDM0rySzJSU1hcCguyc8t0AeTWcUO5noGega6SakliaYAYTzJAykA
+  -->
+<script type="importmap">
+    {
+      "imports": {
+        "@stomp/stompjs": "https://ga.jspm.io/npm:@stomp/stompjs@7.0.0/esm6/index.js"
+      }
+    }
+</script>
+
+<script type="module">
+    import { Client } from '@stomp/stompjs';
+
+    const body = {
+        sender: usernameGlobal,
+        chatRoom: chatRoomId,
+        content: "",
+        type: "CONNECTED"
+    }
+
+    let client = null;
+    function stomp() {
+        if (client === null) {
+            client = new Client({
+                brokerURL: 'ws://localhost:8080/ws',
+                onConnect: () => {
+                    connect();
+                    // setTimeout(() => sendMessage(body), 100);
+                },
+            });
+            client.activate();
+        } else {
+            connect();
+            // setTimeout(() => sendMessage(body), 100);
+        }
+    }
+
+    function connect() {
+        client.subscribe('/sub/chat/room/' + chatRoomId, message =>
+            addChatItem(message)
+        );
+    }
+
+    function addChatItem(message) {
+        let div = document.createElement("div");
+        div.className = "container-fluid row pt-4";
+
+        const contentContainer = document.createElement("div");
+        contentContainer.className = "col-11";
+        const content = document.createElement("div");
+        content.className = "container-fluid";
+        const createdAt = document.createElement("div");
+        createdAt.className = "container-fluid";
+
+        if (message.headers["type"] === "CONNECTED") {
+            // content.className = "chat-connected text-center";
+            // content.textContent = `${message.headers["sender"]}이 입장했습니다.`;
+        } else if (message.headers["type"] === "DISCONNECTED") {
+            // div.className = "chat-connected text-center";
+            // div.textContent = `${message.headers["sender"]}이 퇴장했습니다.`;
+        } else {
+            const profileContainer = document.createElement("div");
+            profileContainer.className = "col-1 p-0";
+            content.textContent = message.body;
+            createdAt.textContent = message.headers["createdAt"];
+            if (message.headers["sender"] !== usernameGlobal) {
+                content.className = "text-start container-fluid";
+                createdAt.className = "text-start container-fluid";
+                profileContainer.innerHTML = "<img  width=\"100%\" src='./profile-you.png' alt=\"\">"
+
+                contentContainer.appendChild(content);
+                contentContainer.appendChild(createdAt);
+                div.appendChild(profileContainer);
+                div.appendChild(contentContainer);
+            } else {
+                content.className = "text-end container-fluid";
+                createdAt.className = "text-end container-fluid";
+                profileContainer.innerHTML = "<img  width=\"100%\" src='./profile-me.png' alt=\"\">"
+
+                contentContainer.appendChild(content);
+                contentContainer.appendChild(createdAt);
+                div.appendChild(contentContainer);
+                div.appendChild(profileContainer);
+            }
+        }
+
+        document.getElementById("chat").appendChild(div);
+    }
+
+    function sendMessage(body) {
+        client.publish({destination: '/pub/chat.sendMessage', body: JSON.stringify(body)});
+    }
+
+    window.stomp = stomp;
+    window.sendMessage = sendMessage;
+</script>
+
+<!-- ES Module Shims: Import maps polyfill for modules browsers without import maps support (all except Chrome 89+) -->
+<script
+        async
+        src="https://ga.jspm.io/npm:es-module-shims@1.5.1/dist/es-module-shims.js"
+        crossorigin="anonymous"
+></script>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
 <script src="js/main.js"></script>
+<script src="js/chat.js"></script>
+<script src="js/friend.js"></script>
+<script src="js/friendRequest.js"></script>
 </body>
 </html>

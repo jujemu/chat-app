@@ -11,19 +11,18 @@ import java.time.LocalDateTime;
 public class Chat {
 
     private String id;
-    private Long chatRoom;
+    private Long chatRoomId;
     private String sender;
-    private String receiver;
     private String content;
-
+    private ChatType type;
     private LocalDateTime createdAt;
 
     @Builder
-    public Chat(Long chatRoom, String sender, String receiver, String content, LocalDateTime createdAt) {
-        this.chatRoom = chatRoom;
+    public Chat(Long chatRoomId, String sender, String content, ChatType type, LocalDateTime createdAt) {
+        this.chatRoomId = chatRoomId;
         this.sender = sender;
-        this.receiver = receiver;
         this.content = content;
+        this.type = type;
         this.createdAt = createdAt;
     }
 }
