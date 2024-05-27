@@ -16,8 +16,7 @@ function sendRequest(event) {
     fetch(url, {
         method: 'POST',
         headers: {
-            'Authorization': "Basic " +
-                btoa(usernameGlobal + ":" + passwordGlobal)
+            'Authorization': "Basic " + getAuth(usernameGlobal, passwordGlobal)
         }
     })
         .then(response => {
@@ -40,8 +39,7 @@ function getFriendsRequest() {
     const url = `/friend/requests?${queryString}`;
     fetch(url, {
         headers: {
-            'Authorization': "Basic " +
-                btoa(usernameGlobal + ":" + passwordGlobal)
+            'Authorization': "Basic " + getAuth(usernameGlobal, passwordGlobal)
         }
     })
         .then(response => response.json())
@@ -102,8 +100,7 @@ function requestEventHandler(acceptOrDeny, listItem) {
         fetch(url, {
             method: 'POST',
             headers: {
-                'Authorization': "Basic " +
-                    btoa(usernameGlobal + ":" + passwordGlobal)
+                'Authorization': "Basic " + getAuth(usernameGlobal, passwordGlobal)
             }
         })
             .then(() => {

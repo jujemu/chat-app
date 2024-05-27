@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -55,26 +57,26 @@ public class FriendController {
 
     @PostMapping("/friend/request/{myName}/{receiverName}")
     public void sendRequest(@PathVariable String myName, @PathVariable String receiverName, Authentication authentication) {
-        isRequestFromMe(authentication.getPrincipal(), myName);
+        isRequestFromMe(authentication, myName);
         friendService.sendRequest(myName, receiverName);
         sendEventOfRequest(myName, receiverName, "friendRequest");
     }
 
     @PostMapping("/friend/request/accept/{myName}/{receiverName}")
     public void acceptRequest(@PathVariable String myName, @PathVariable String receiverName, Authentication authentication) {
-        isRequestFromMe(authentication.getPrincipal(), myName);
+        isRequestFromMe(authentication, myName);
         friendService.acceptRequest(myName, receiverName);
         sendEventOfRequest(myName, receiverName, "requestAccept");
     }
 
     @PostMapping("/friend/request/deny/{myName}/{receiverName}")
     public void denyRequest(@PathVariable String myName, @PathVariable String receiverName, Authentication authentication) {
-        isRequestFromMe(authentication.getPrincipal(), myName);
+        isRequestFromMe(authentication, myName);
         friendService.denyRequest(myName, receiverName);
     }
 
-    private void isRequestFromMe(Object authentication, String myName) {
-        User user = (User) authentication;
+    private void isRequestFromMe(Authentication authentication, String myName) {
+        User user = (User) authentication.getPrincipal();
         if (!user.getUsername().equals(myName))
             throw new RestApiException(UserErrorCode.UNAUTHORIZED);
     }

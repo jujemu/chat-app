@@ -4,7 +4,7 @@ let passwordGlobal = null;
 function registerAndLogin() {
     return async function (event) {
         event.preventDefault();
-        username = document.getElementById('username').value;
+        let username = document.getElementById('username').value;
         let password = document.getElementById('password').value;
         const response = await fetch(`/create/available?username=${username}`);
         const isNeededRegister = await response.text()
@@ -38,12 +38,15 @@ function registerUser(username, password) {
         });
 }
 
+function getAuth(username, password) {
+    return btoa(encodeURIComponent(username) + ":" + encodeURIComponent(password));
+}
+
 function login(username, password) {
     fetch("/login", {
         method: 'GET',
         headers: {
-            'Authorization': "Basic " +
-                btoa(username + ":" + password)
+            'Authorization': "Basic " + getAuth(username, password)
         }
     })
         .then(response => {

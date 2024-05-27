@@ -1,8 +1,12 @@
 package com.chatapp.kakaka.config.websocket;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.lang.NonNull;
+import org.springframework.messaging.Message;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.security.authorization.AuthorizationManager;
+import org.springframework.security.config.annotation.web.socket.EnableWebSocketSecurity;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
@@ -15,7 +19,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public static String SUBSCRIPTION_URL = "/sub";
 
     /*
-    WebSocket 연결을 설정하고 클라이언트가 STOMP 프로토콜을 사용하여 서버와 통신할 수 있도록 한다.
+        WebSocket 연결을 설정하고 클라이언트가 STOMP 프로토콜을 사용하여 서버와 통신할 수 있도록 한다.
      */
     @Override
     public void registerStompEndpoints(@NonNull StompEndpointRegistry registry) {
@@ -39,4 +43,5 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.setApplicationDestinationPrefixes(PUBLISHER_URL);
         registry.enableSimpleBroker(SUBSCRIPTION_URL);
     }
+
 }

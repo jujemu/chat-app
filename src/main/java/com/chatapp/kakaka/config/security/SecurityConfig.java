@@ -30,8 +30,8 @@ public class SecurityConfig {
                 .logoutSuccessUrl("/"));
 
         http.authorizeHttpRequests(a -> a
-                .requestMatchers("/js/**", "/css/**", "/create/**", "/", "/index.html").permitAll()
-                .requestMatchers("/h2-console/**", "/friend/requests/connect").permitAll()
+                .requestMatchers("/js/**", "/css/**", "/create/**", "/", "/index.html", "profile-*.png").permitAll()
+                .requestMatchers("/h2-console/**", "/friend/requests/connect", "/ws/**").permitAll()
                 .anyRequest().authenticated()
         );
 

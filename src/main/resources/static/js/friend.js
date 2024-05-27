@@ -1,8 +1,7 @@
 function getFriendsList() {
     fetch("/friend/all/" + usernameGlobal, {
         headers: {
-            'Authorization': "Basic " +
-                btoa(usernameGlobal + ":" + passwordGlobal)
+            'Authorization': "Basic " + getAuth(usernameGlobal, passwordGlobal)
         }
     })
         .then(response => response.json())
@@ -31,6 +30,8 @@ function getFriendItem(data) {
                 listItem.appendChild(badge);
             }
             listItem.className = "list-group-item d-flex justify-content-between align-items-center";
+            listItem.addEventListener('click', getChatRoomId);
+
             userListElement.appendChild(listItem);
         });
     selected('friends');
