@@ -12,6 +12,7 @@ function getChatRoomId(event) {
     event.currentTarget.childNodes.forEach(node => {
         if (node.nodeType === Node.TEXT_NODE) friendName += node.textContent;
     })
+    document.getElementById("chat-title").textContent = "Chat with " + friendName;
     const url = "/chat/rooms?";
     let params = new URLSearchParams({
         myName: usernameGlobal,
@@ -137,7 +138,15 @@ function chatPush() {
         content: message
     }
     sendMessage(body);
+    document.getElementById("chat-message").value = "";
 }
 
 document.getElementById("chat-push")
     .addEventListener("click", chatPush);
+
+document.querySelector("#chat-message")
+    .addEventListener('keypress', (event) => {
+        if (event.key === 'Enter') {
+            chatPush();
+        }
+    });

@@ -12,7 +12,7 @@ function sendRequest(event) {
     event.preventDefault();
     const friendName = document.getElementById('friendRequestName').value;
     const url = '/friend/request/' + usernameGlobal + '/' + friendName;
-
+    document.getElementById('friendRequestName').value = "";
     fetch(url, {
         method: 'POST',
         headers: {
