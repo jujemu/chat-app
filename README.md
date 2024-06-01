@@ -9,3 +9,6 @@
 
 서버를 실행할 때마다 mongodb가 초기화되기를 원한다면(채팅 메세지 초기화), profile을 dev로 실행할 것.
 
+## Video
+
+![](video.gif)
