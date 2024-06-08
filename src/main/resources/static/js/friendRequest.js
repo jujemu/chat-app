@@ -155,6 +155,20 @@ function getFriendRequestListConnect() {
         }
         getFriendItem(data);
     })
+
+    sse.onopen = function () {
+        const url = "/events" + "?" + `myName=${usernameGlobal}&lastEventId=${lastEventId}`
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': "Basic " + getAuth(usernameGlobal, passwordGlobal)
+            }
+        });
+    };
+
+    sse.onerror = function () {
+        console.info(`${usernameGlobal}의 연결이 끝났습니다. 3초의 재연결 대기 시간을 가집니다.`);
+    };
 }
 
 document.getElementById('friendRequest-btn')
