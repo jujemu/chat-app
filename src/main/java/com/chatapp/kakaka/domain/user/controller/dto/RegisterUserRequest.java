@@ -1,4 +1,4 @@
-package com.chatapp.kakaka.domain.user.controller;
+package com.chatapp.kakaka.domain.user.controller.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
