@@ -1,6 +1,8 @@
 package com.chatapp.kakaka.domain.user.service;
 
 import com.chatapp.kakaka.domain.friend.Friend;
+import com.chatapp.kakaka.domain.friend.event.FriendRequestEvent;
+import com.chatapp.kakaka.domain.friend.event.repository.EventRepository;
 import com.chatapp.kakaka.domain.friend.repository.FriendRepository;
 import com.chatapp.kakaka.domain.user.User;
 import com.chatapp.kakaka.domain.user.repository.UserRepository;
@@ -8,6 +10,7 @@ import com.chatapp.kakaka.exception.RestApiException;
 import com.chatapp.kakaka.exception.errorcode.UserErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +24,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final FriendRepository friendRepository;
+    private final EventRepository eventRepository;
 
     public boolean canCreate(String username) {
         return userRepository.findUserByUsername(username).isEmpty();
@@ -39,5 +43,18 @@ public class UserService {
                         Friend.requestPlusFriend(user, plus))
                 .toList();
         friendRepository.saveAll(initFriends);
+    }
+
+    @Transactional(readOnly = true)
+    public List<FriendRequestEvent> getLastEventId(String myName, Long lastEventId) {
+        User user = userRepository.findUserByUsername(myName).orElseThrow(() ->
+                new UsernameNotFoundException("The user with given username does not exist."));
+        if (isOutUpdated(lastEventId, user))
+            return eventRepository.findByReceiverNameAndIdGreaterThan(myName, lastEventId);
+        return null;
+    }
+
+    private boolean isOutUpdated(Long lastEventId, User user) {
+        return !lastEventId.equals(user.getLastEventId());
     }
 }

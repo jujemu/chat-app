@@ -2,6 +2,7 @@ package com.chatapp.kakaka.domain.user.controller;
 
 import com.chatapp.kakaka.config.security.SecurityConfig;
 import com.chatapp.kakaka.domain.user.User;
+import com.chatapp.kakaka.domain.user.controller.dto.RegisterUserRequest;
 import com.chatapp.kakaka.domain.user.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;

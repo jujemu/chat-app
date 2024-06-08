@@ -1,3 +1,5 @@
+let lastEventId = 0;
+
 function friendRequest_modalShow() {
     return function(event) {
         event.preventDefault();
@@ -132,6 +134,7 @@ function getFriendRequestListConnect() {
 
     sse.addEventListener('friendRequest', (e) => {
         const { data: requestUserName } = e;
+        lastEventId = e.lastEventId;
         const data = {
             friends: [{
                 type: "NORMAL",
@@ -143,6 +146,7 @@ function getFriendRequestListConnect() {
 
     sse.addEventListener('requestAccept', (e) => {
         const { data: username } = e;
+        lastEventId = e.lastEventId;
         const data = {
             friends: [{
                 type: "NORMAL",
