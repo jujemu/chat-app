@@ -15,8 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -43,7 +41,8 @@ public class FriendController {
         if (myName == null || myName.isBlank())
             throw new RestApiException(CommonErrorCode.INVALID_PARAMETER);
 
-        SseEmitter sseEmitter = new SseEmitter(1000L * 60);
+        // 클라이언트와 text/stream 연결된 직후에 메세지를 보내서 연결이 해제되지 않도록 한다.
+        SseEmitter sseEmitter = new SseEmitter(1000L * 120);
         emitters.add(myName, sseEmitter);
         try {
             sseEmitter.send(SseEmitter.event()
@@ -58,15 +57,15 @@ public class FriendController {
     @PostMapping("/friend/request/{myName}/{receiverName}")
     public void sendRequest(@PathVariable String myName, @PathVariable String receiverName, Authentication authentication) {
         isRequestFromMe(authentication, myName);
-        friendService.sendRequest(myName, receiverName);
-        sendEventOfRequest(myName, receiverName, "friendRequest");
+        Long eventId = friendService.sendRequest(myName, receiverName);
+        sendEventOfRequest(myName, receiverName, "friendRequest", eventId);
     }
 
     @PostMapping("/friend/request/accept/{myName}/{receiverName}")
     public void acceptRequest(@PathVariable String myName, @PathVariable String receiverName, Authentication authentication) {
         isRequestFromMe(authentication, myName);
-        friendService.acceptRequest(myName, receiverName);
-        sendEventOfRequest(myName, receiverName, "requestAccept");
+        Long eventId = friendService.acceptRequest(myName, receiverName);
+        sendEventOfRequest(myName, receiverName, "requestAccept", eventId);
     }
 
     @PostMapping("/friend/request/deny/{myName}/{receiverName}")
@@ -81,7 +80,7 @@ public class FriendController {
             throw new RestApiException(UserErrorCode.UNAUTHORIZED);
     }
 
-    private void sendEventOfRequest(String myName, String receiverName, String eventName) {
+    private void sendEventOfRequest(String myName, String receiverName, String eventName, Long eventId) {
         try {
             Optional<SseEmittersWithUsername> optEmitter = emitters.getEmitters().stream()
                     .filter(e -> e.getUsername().equals(receiverName))
@@ -90,8 +89,9 @@ public class FriendController {
             SseEmitter emitter = optEmitter.get().getEmitter();
             emitter.send(
                     SseEmitter.event()
-                        .name(eventName)
-                        .data(myName)
+                            .id(String.valueOf(eventId))
+                            .name(eventName)
+                            .data(myName)
             );
         } catch (IOException e) {
             throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR);

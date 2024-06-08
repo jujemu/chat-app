@@ -10,10 +10,6 @@ spring:
       enabled: true
 
   jpa:
-    hibernate:
-      ddl-auto: create-drop
-    defer-datasource-initialization: true
-
     # sse 사용으로 JPA DB connection 반환을 메서드 반환 시점에 진행하기 위해 설정
     open-in-view: false
 
@@ -24,6 +20,18 @@ spring:
   data:
     mongodb:
       uri: mongodb://localhost:27017/chat
+
+
+
+---
+spring:
+  profiles:
+    active: dev
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    defer-datasource-initialization: true
 
 logging:
   level:

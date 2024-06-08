@@ -1,3 +1,5 @@
+let lastEventId = 0;
+
 function friendRequest_modalShow() {
     return function(event) {
         event.preventDefault();
@@ -132,6 +134,7 @@ function getFriendRequestListConnect() {
 
     sse.addEventListener('friendRequest', (e) => {
         const { data: requestUserName } = e;
+        lastEventId = e.lastEventId;
         const data = {
             friends: [{
                 type: "NORMAL",
@@ -143,6 +146,7 @@ function getFriendRequestListConnect() {
 
     sse.addEventListener('requestAccept', (e) => {
         const { data: username } = e;
+        lastEventId = e.lastEventId;
         const data = {
             friends: [{
                 type: "NORMAL",
@@ -151,6 +155,20 @@ function getFriendRequestListConnect() {
         }
         getFriendItem(data);
     })
+
+    sse.onopen = function () {
+        const url = "/events" + "?" + `myName=${usernameGlobal}&lastEventId=${lastEventId}`
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': "Basic " + getAuth(usernameGlobal, passwordGlobal)
+            }
+        });
+    };
+
+    sse.onerror = function () {
+        console.info(`${usernameGlobal}의 연결이 끝났습니다. 3초의 재연결 대기 시간을 가집니다.`);
+    };
 }
 
 document.getElementById('friendRequest-btn')

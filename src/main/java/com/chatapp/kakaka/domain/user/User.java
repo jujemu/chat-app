@@ -30,11 +30,8 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
-    @OneToMany(mappedBy = "userA")
-    private List<ChatRoom> chatRooms;
-
-    @OneToMany(mappedBy = "sender", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-    private List<Friend> myFriends;
+    @Column(columnDefinition = "bigint DEFAULT 0")
+    private Long lastEventId = 0L;
 
     @Builder(access = AccessLevel.PRIVATE)
     private User(String username, String password, UserRole role) {
@@ -67,6 +64,10 @@ public class User extends BaseEntity {
                         String.valueOf(role))
                 )
                 .build();
+    }
+
+    public void updateEvent(Long lastEventId) {
+        this.lastEventId = lastEventId;
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.chatapp.kakaka.domain.friend.service;
 
+import com.chatapp.kakaka.domain.friend.event.service.EventService;
 import com.chatapp.kakaka.exception.RestApiException;
 import com.chatapp.kakaka.exception.errorcode.CommonErrorCode;
 import com.chatapp.kakaka.exception.errorcode.FriendErrorCode;
@@ -24,6 +25,7 @@ import static com.chatapp.kakaka.exception.errorcode.FriendErrorCode.REQUEST_NOT
 @Service
 public class FriendService {
 
+    private final EventService eventService;
     private final FriendRepository friendRepository;
     private final UserRepository userRepository;
 
@@ -42,30 +44,23 @@ public class FriendService {
     /*
     친구를 요청할 때는 sender(me) 와 receiver 값을 번갈아가며, 2개의 튜플로 저장한다.
      */
-    public void sendRequest(String myName, String receiverName) {
+    public Long sendRequest(String myName, String receiverName) {
         User sender = getUser(myName);
         User receiver = getUser(receiverName);
 
-        Optional<Friend> optFriend = friendRepository.findBySenderAndReceiver(myName, receiverName);
-        cannotRequestMyself(sender.getUsername(), receiver.getUsername());
-        cannotDuplicatedRequest(optFriend);
-        cannotRequestFriend(optFriend);
+        Optional<Friend> optFriend = getOptFriend(myName, receiverName, sender, receiver);
 
-        if (optFriend.isPresent() && optFriend.get().getStatus().equals(FriendStatus.DENIED)) {
-            Friend friend = optFriend.get();
-            Friend friendReverse = friendRepository.findBySenderAndReceiver(receiverName, myName).orElseThrow();
-            friend.reRequestedSender();
-            friendReverse.reRequestedReceiver();
-            return;
-        }
+        if (isRequestDenied(optFriend))
+            return handleAlreadyRequest(myName, receiverName, optFriend.get());
 
-        List<Friend> friends = Friend.requestFriend(sender, receiver);
-        friendRepository.saveAll(friends);
+        return handleNewRequest(sender, receiver);
     }
 
-    public void acceptRequest(String myName, String receiverName) {
+    public Long acceptRequest(String myName, String receiverName) {
         List<Friend> friendRequests = getFriendRequests(myName, receiverName);
         friendRequests.forEach(Friend::accepted);
+        Friend friend = friendRequests.get(0);
+        return eventService.create(friend.getSender().getUsername(), friend.getReceiver().getUsername(), "requestAccept");
     }
 
     public void denyRequest(String myName, String receiverName) {
@@ -108,5 +103,35 @@ public class FriendService {
     private void cannotRequestFriend(Optional<Friend> optFriend) {
         if (optFriend.isPresent() && optFriend.get().getStatus().equals(FriendStatus.ACCEPTED))
             throw new RestApiException(CommonErrorCode.INVALID_PARAMETER);
+    }
+
+    private boolean isRequestDenied(Optional<Friend> optFriend) {
+        return optFriend.isPresent() && optFriend.get().getStatus().equals(FriendStatus.DENIED);
+    }
+
+    private Optional<Friend> getOptFriend(String myName, String receiverName, User sender, User receiver) {
+        Optional<Friend> optFriend = friendRepository.findBySenderAndReceiver(myName, receiverName);
+        cannotRequestMyself(sender.getUsername(), receiver.getUsername());
+        cannotDuplicatedRequest(optFriend);
+        cannotRequestFriend(optFriend);
+        return optFriend;
+    }
+
+    private Long handleAlreadyRequest(String myName, String receiverName, Friend friend) {
+        Friend friendReverse = friendRepository.findBySenderAndReceiver(receiverName, myName).orElseThrow();
+        friend.reRequestedSender();
+        friendReverse.reRequestedReceiver();
+        Long eventId = eventService.create(friend.getSender().getUsername(), friend.getReceiver().getUsername(), "friendRequest");
+        friend.getReceiver().updateEvent(eventId);
+        return eventId;
+    }
+
+    private Long handleNewRequest(User sender, User receiver) {
+        List<Friend> friends = Friend.requestFriend(sender, receiver);
+        friendRepository.saveAll(friends);
+        Friend friend = friends.get(0);
+        Long eventId = eventService.create(friend.getSender().getUsername(), friend.getReceiver().getUsername(), "friendRequest");
+        friend.getReceiver().updateEvent(eventId);
+        return eventId;
     }
 }
