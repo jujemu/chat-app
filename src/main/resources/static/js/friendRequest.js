@@ -157,13 +157,15 @@ function getFriendRequestListConnect() {
     })
 
     sse.onopen = function () {
-        const url = "/events" + "?" + `myName=${usernameGlobal}&lastEventId=${lastEventId}`
-        fetch(url, {
-            method: 'GET',
-            headers: {
-                'Authorization': "Basic " + getAuth(usernameGlobal, passwordGlobal)
-            }
-        });
+        if (lastEventId !== 0) {
+            const url = "/events" + "?" + `myName=${usernameGlobal}&lastEventId=${lastEventId}`
+            fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Authorization': "Basic " + getAuth(usernameGlobal, passwordGlobal)
+                }
+            });
+        }
     };
 
     sse.onerror = function () {
