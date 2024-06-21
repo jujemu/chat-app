@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 @Component
-@Profile("dev")
 public class DevMongoDBInitializer implements CommandLineRunner {
 
     private final MongoTemplate mongoTemplate;

@@ -1,0 +1,34 @@
+services:
+  app1:
+    image: jujemu/chat-app:latest
+    networks:
+      - chat_network
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:7.0.11
+    container_name: mongodb
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=root
+    networks:
+      - chat_network
+    ports:
+      - "27017:27017"
+    expose:
+      - "27017"
+
+  web:
+    image: web-server:latest
+    networks:
+      - chat_network
+    ports:
+      - "80:80"
+    depends_on:
+      - app1
+
+networks:
+  chat_network:
+      name: chat_network
+      external: true
