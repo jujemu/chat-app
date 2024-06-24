@@ -1,3 +1,5 @@
+let client = null;
+let subscription = null;
 let chatRoomId = null;
 
 function chatPage() {
@@ -35,8 +37,11 @@ function getChatRoomId(event) {
     })
         .then(response => response.text())
         .then(data => {
+            if (client !== null) {
+                client.unsubscribe("chat");
+            }
             chatRoomId = data;
-            connectChatRoom(data)
+            connectChatRoom(data);
         })
         .catch(error => {
             alert("error getting chatroom, " + error);
@@ -60,13 +65,15 @@ function showChats(chatRoomId) {
 
     getChats(chatRoomId)
         .then(chats => {
-            chats["chats"]
-                .sort((a, b) => a["id"].localeCompare(b["id"]))
-                .forEach(
-                    chat => {
-                        addChatItem(chat, chatContainer);
-                    }
-                );
+            if (chats !== undefined) {
+                chats["chats"]
+                    .sort((a, b) => a["id"].localeCompare(b["id"]))
+                    .forEach(
+                        chat => {
+                            addChatItem(chat, chatContainer);
+                        }
+                    );
+            }
         });
 }
 

@@ -135,7 +135,6 @@
         type: "CONNECTED"
     }
 
-    let client = null;
     function stomp() {
         if (client === null) {
             client = new Client({
@@ -153,8 +152,10 @@
     }
 
     function connect() {
-        client.subscribe('/sub/chat/room/' + chatRoomId, message =>
-            addChatItem(message)
+        subscription = client.subscribe(
+            '/sub/chat/room/' + chatRoomId,
+            message => addChatItem(message),
+            {id:"chat"}
         );
     }
 
