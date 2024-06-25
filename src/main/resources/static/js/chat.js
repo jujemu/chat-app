@@ -54,8 +54,8 @@ function connectChatRoom(chatRoomId) {
         return;
     }
 
-    stomp(chatRoomId);
-    setTimeout(() => showChats(chatRoomId), 100);
+    showChats(chatRoomId);
+    setTimeout(() => stomp(chatRoomId), 10);
 }
 
 function showChats(chatRoomId) {
@@ -74,6 +74,7 @@ function showChats(chatRoomId) {
                         }
                     );
             }
+            chatContainer.scrollTop = chatContainer.scrollHeight;
         });
 }
 
