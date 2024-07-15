@@ -6,6 +6,13 @@ services:
     depends_on:
       - mongo
 
+  app2:
+    image: jujemu/chat-app:latest
+    networks:
+      - chat_network
+    depends_on:
+      - mongo
+
   mongo:
     image: mongo:7.0.11
     container_name: mongodb

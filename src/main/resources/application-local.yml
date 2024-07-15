@@ -12,3 +12,15 @@ spring:
   data:
     mongodb:
       uri: mongodb://localhost:27017/chat
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+
+    open-in-view: false # sse 사용으로 JPA DB connection 반환을 메서드 반환 시점에 진행하기 위해 설정
+
+    defer-datasource-initialization: true
+
+  sql:
+    init:
+      mode: always
