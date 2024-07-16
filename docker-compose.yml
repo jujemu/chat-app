@@ -3,6 +3,10 @@ services:
     image: jujemu/chat-app:latest
     networks:
       - chat_network
+    environment:
+      - COLOR=red
+    expose:
+      - "8080"
     depends_on:
       - mongo
 
@@ -10,8 +14,13 @@ services:
     image: jujemu/chat-app:latest
     networks:
       - chat_network
+    environment:
+      - COLOR=blue
     depends_on:
       - mongo
+
+  redis:
+    image: jujemu/chat-app:redis
 
   mongo:
     image: mongo:7.0.11

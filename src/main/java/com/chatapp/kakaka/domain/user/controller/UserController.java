@@ -10,6 +10,7 @@ import com.chatapp.kakaka.exception.errorcode.CommonErrorCode;
 import com.chatapp.kakaka.exception.errorcode.UserErrorCode;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.env.Environment;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +26,7 @@ public class UserController {
 
     private final UserService userService;
     private final SseEmitters emitters;
+    private final Environment environment;
 
     @GetMapping("/create/available")
     public boolean check(@RequestParam String username) {

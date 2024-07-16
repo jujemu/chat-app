@@ -1,4 +1,4 @@
-package com.chatapp.kakaka.domain.chat.controller;
+package com.chatapp.kakaka.domain.chat.controller.dto;
 
 import com.chatapp.kakaka.domain.chat.Chat;
 import lombok.AccessLevel;

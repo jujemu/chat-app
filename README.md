@@ -12,3 +12,9 @@
 ## Video
 
 ![](video.gif)
+
+## 아키텍쳐 개선
+
+![](images/1.png)
+![](images/2.png)
+![](images/3.png)

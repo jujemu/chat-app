@@ -31,7 +31,7 @@ public class SecurityConfig {
 
         http.authorizeHttpRequests(a -> a
                 .requestMatchers("/js/**", "/css/**", "/create/**", "/", "/index.html", "profile-*.png").permitAll()
-                .requestMatchers("/h2-console/**", "/friend/requests/connect", "/ws/**").permitAll()
+                .requestMatchers("/h2-console/**", "/friend/requests/connect", "/ws/**", "/red-blue").permitAll()
                 .anyRequest().permitAll()
         );
 

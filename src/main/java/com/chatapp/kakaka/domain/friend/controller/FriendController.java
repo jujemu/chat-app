@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
@@ -42,7 +43,7 @@ public class FriendController {
             throw new RestApiException(CommonErrorCode.INVALID_PARAMETER);
 
         // 클라이언트와 text/stream 연결된 직후에 메세지를 보내서 연결이 해제되지 않도록 한다.
-        SseEmitter sseEmitter = new SseEmitter(1000L * 1);
+        SseEmitter sseEmitter = new SseEmitter(1000L * 120);
         emitters.add(myName, sseEmitter);
         try {
             sseEmitter.send(SseEmitter.event()

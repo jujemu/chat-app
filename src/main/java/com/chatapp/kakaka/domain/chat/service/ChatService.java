@@ -1,7 +1,7 @@
 package com.chatapp.kakaka.domain.chat.service;
 
 import com.chatapp.kakaka.domain.chat.Chat;
-import com.chatapp.kakaka.domain.chat.controller.ChatResponse;
+import com.chatapp.kakaka.domain.chat.controller.dto.ChatResponse;
 import com.chatapp.kakaka.domain.chat.controller.dto.ChatMessage;
 import com.chatapp.kakaka.domain.chat.repository.ChatRepository;
 import lombok.RequiredArgsConstructor;
