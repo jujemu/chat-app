@@ -202,7 +202,9 @@
             }
         }
 
-        document.getElementById("chat").appendChild(div);
+        const chat = document.getElementById("chat");
+        chat.appendChild(div);
+        chat.scrollTop = chat.scrollHeight;
     }
 
     function sendMessage(body) {

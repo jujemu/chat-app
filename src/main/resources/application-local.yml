@@ -12,3 +12,12 @@ spring:
   data:
     mongodb:
       uri: mongodb://localhost:27017/chat
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    defer-datasource-initialization: true
+
+  sql:
+    init:
+      mode: always

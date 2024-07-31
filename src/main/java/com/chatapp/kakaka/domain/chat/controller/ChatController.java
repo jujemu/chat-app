@@ -1,6 +1,7 @@
 package com.chatapp.kakaka.domain.chat.controller;
 
 import com.chatapp.kakaka.domain.chat.controller.dto.ChatMessage;
+import com.chatapp.kakaka.domain.chat.controller.dto.ChatResponse;
 import com.chatapp.kakaka.domain.chat.service.ChatService;
 import com.chatapp.kakaka.exception.RestApiException;
 import com.chatapp.kakaka.exception.errorcode.UserErrorCode;
