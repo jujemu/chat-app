@@ -1,5 +1,7 @@
 package com.chatapp.kakaka.config.redis;
 
+import com.chatapp.kakaka.config.redis.message.MessageDto;
+import com.chatapp.kakaka.domain.friend.service.FriendService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -16,12 +18,15 @@ public class RedisSubscribeListener implements MessageListener {
 
     private final RedisTemplate<String, Object> template;
     private final ObjectMapper objectMapper;
+    private final FriendService friendService;
 
     @Override
     public void onMessage(Message message, byte[] pattern) {
         try {
             String publishMessage = template.getStringSerializer().deserialize(message.getBody());
             MessageDto messageDto = objectMapper.readValue(publishMessage, MessageDto.class);
+
+
         } catch (JsonProcessingException e) {
             log.info("JsonProcessingException occurs in redis subscription.");
         }

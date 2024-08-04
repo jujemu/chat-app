@@ -24,6 +24,7 @@ docker run -d \
   --name redis \
   --expose 6379 \
   -p 6379:6379 \
+  --network chat_network \
   redis
 
 # nginx 빌드, 설정파일을 바꾸기 위해 따로 빌드한다.
@@ -37,11 +38,6 @@ if ! docker images | grep -q ${docker_image_name}:latest; then
   docker image rm -f ${docker_image_name}:latest
 fi
 docker build -t "${docker_image_name}:latest" .
-
-if ! docker images | grep -q ${docker_image_name}:redis; then
-  docker image rm -f ${docker_image_name}:redis
-fi
-docker build -t "${docker_image_name}:redis" -f redis-pubsub/Dockerfile redis-pubsub
 
 # mysql 이 완전히 실행될 때까지 기다린다.
 sleep 5
