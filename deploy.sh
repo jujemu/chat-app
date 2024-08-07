@@ -1,6 +1,10 @@
 #!/bin/bash
 docker_image_name="jujemu/chat-app"
 
+
+# 도커 컨테이너 초기화
+docker rm -f $(docker ps -aq)
+
 # 그레이들 빌드
 chmod +x ./gradlew
 ./gradlew clean build -x test

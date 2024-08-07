@@ -1,6 +1,5 @@
 package com.chatapp.kakaka.config.redis.message;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,16 +15,14 @@ public class MessageDto implements Serializable {
     private static final long serialVersionUID = 1L;
 
     // TODO MessageDto 필드를 줄이거나 String 으로 전송해도 괜찮을거 같다.
-    private Long id;
-    private String message;
+    private String type;
     private String sender;
-    private String roomId;
+    private String receiver;
 
     @Builder
-    public MessageDto(Long id, String message, String sender, String roomId) {
-        this.id = id;
-        this.message = message;
+    public MessageDto(String type, String sender, String receiver) {
+        this.type = type;
         this.sender = sender;
-        this.roomId = roomId;
+        this.receiver = receiver;
     }
 }

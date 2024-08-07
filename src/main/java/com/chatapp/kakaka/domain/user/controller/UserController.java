@@ -1,7 +1,6 @@
 package com.chatapp.kakaka.domain.user.controller;
 
 import com.chatapp.kakaka.config.sse.SseEmitters;
-import com.chatapp.kakaka.config.sse.SseEmittersWithUsername;
 import com.chatapp.kakaka.domain.friend.event.FriendRequestEvent;
 import com.chatapp.kakaka.domain.user.controller.dto.RegisterUserRequest;
 import com.chatapp.kakaka.domain.user.service.UserService;
@@ -64,17 +63,13 @@ public class UserController {
     }
 
     private void isConnected(String myName) {
-        if (emitters.getEmitters().stream().noneMatch(emitter -> emitter.getUsername().equals(myName)))
+        if (emitters.getEmitters().containsKey(myName))
             throw new RestApiException(CommonErrorCode.RESOURCE_NOT_FOUND);
     }
 
     private void sendEventOfRequest(FriendRequestEvent event) {
         try {
-            Optional<SseEmittersWithUsername> optEmitter = emitters.getEmitters().stream()
-                    .filter(e -> e.getUsername().equals(event.getReceiverName()))
-                    .findAny();
-            if (optEmitter.isEmpty()) return;
-            SseEmitter emitter = optEmitter.get().getEmitter();
+            SseEmitter emitter = emitters.getEmitters().get(event.getReceiverName());
             emitter.send(
                     SseEmitter.event()
                             .id(String.valueOf(event.getId()))

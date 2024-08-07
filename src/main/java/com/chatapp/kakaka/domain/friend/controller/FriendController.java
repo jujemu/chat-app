@@ -3,13 +3,15 @@ package com.chatapp.kakaka.domain.friend.controller;
 import com.chatapp.kakaka.config.redis.RedisPublisher;
 import com.chatapp.kakaka.config.redis.RedisSubscribeListener;
 import com.chatapp.kakaka.config.redis.message.MessageDto;
-import com.chatapp.kakaka.config.sse.SseEmittersWithUsername;
+import com.chatapp.kakaka.config.redis.message.PubSubMessage;
+import com.chatapp.kakaka.config.sse.SseEmitters;
 import com.chatapp.kakaka.domain.friend.controller.dto.FriendListResponse;
 import com.chatapp.kakaka.domain.friend.service.FriendService;
 import com.chatapp.kakaka.exception.RestApiException;
 import com.chatapp.kakaka.exception.errorcode.CommonErrorCode;
 import com.chatapp.kakaka.exception.errorcode.UserErrorCode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.http.MediaType;
@@ -21,6 +23,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.io.IOException;
 import java.util.Optional;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 public class FriendController {
@@ -29,7 +32,7 @@ public class FriendController {
     private final RedisPublisher redisPublisher;
     private final RedisMessageListenerContainer redisMessageListenerContainer;
     private final RedisSubscribeListener redisSubscribeListener;
-//    private final SseEmitters emitters;
+    private final SseEmitters emitters;
 
     @GetMapping("/friend/all/{myName}")
     public FriendListResponse showAll(@PathVariable String myName) {
@@ -69,20 +72,21 @@ public class FriendController {
     @PostMapping("/friend/request/{myName}/{receiverName}")
     public void sendRequest(@PathVariable String myName, @PathVariable String receiverName, Authentication authentication) {
         isRequestFromMe(authentication, myName);
-        Long eventId = friendService.sendRequest(myName, receiverName);
+//        Long eventId = friendService.sendRequest(myName, receiverName);
+        log.info("여기 왔다.");
         redisPublisher.publish(
                 ChannelTopic.of(receiverName),
-                getMessage(eventId, myName, receiverName, "friendRequest")
+                getMessage(myName, receiverName, PubSubMessage.FRIEND_REQUEST)
         );
     }
 
     @PostMapping("/friend/request/accept/{myName}/{receiverName}")
     public void acceptRequest(@PathVariable String myName, @PathVariable String receiverName, Authentication authentication) {
         isRequestFromMe(authentication, myName);
-        Long eventId = friendService.acceptRequest(myName, receiverName);
+//        Long eventId = friendService.acceptRequest(myName, receiverName);
         redisPublisher.publish(
                 ChannelTopic.of(receiverName),
-                getMessage(eventId, myName, receiverName, "requestAccept")
+                getMessage(myName, receiverName, PubSubMessage.REQUEST_ACCEPT)
         );
     }
 
@@ -98,30 +102,11 @@ public class FriendController {
             throw new RestApiException(UserErrorCode.UNAUTHORIZED);
     }
 
-    private void sendEventOfRequest(String myName, String receiverName, String eventName, Long eventId) {
-        try {
-            Optional<SseEmittersWithUsername> optEmitter = emitters.getEmitters().stream()
-                    .filter(e -> e.getUsername().equals(receiverName))
-                    .findAny();
-            if (optEmitter.isEmpty()) return;
-            SseEmitter emitter = optEmitter.get().getEmitter();
-            emitter.send(
-                    SseEmitter.event()
-                            .id(String.valueOf(eventId))
-                            .name(eventName)
-                            .data(myName)
-            );
-        } catch (IOException e) {
-            throw new RestApiException(CommonErrorCode.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    private MessageDto getMessage(Long id, String myName, String receiverName, String friendRequest) {
+    private MessageDto getMessage(String myName, String receiverName, PubSubMessage type) {
         return MessageDto.builder()
-                .id(id)
-                .message(friendRequest)
+                .type(type.getText())
                 .sender(myName)
-                .roomId(receiverName)
+                .receiver(receiverName)
                 .build();
     }
 }

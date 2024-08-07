@@ -15,7 +15,6 @@ import org.springframework.data.redis.repository.configuration.EnableRedisReposi
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-@Profile("dev")
 @RequiredArgsConstructor
 @Configuration
 @EnableRedisRepositories
@@ -29,12 +28,12 @@ public class RedisConfig {
     }
 
     /*
-    redis key-value 기본값은 string(hash) 이기 때문에
-    value 로 자바 Object 를 전달하기 위한 설정
+        redis key-value 기본값은 string(hash) 이기 때문에
+        value 로 자바 Object 를 전달하기 위한 설정
      */
     @Bean
-    public RedisTemplate<?, ?> redisTemplate() {
-        RedisTemplate<?, ?> redisTemplate = new RedisTemplate<>();
+    public RedisTemplate<String, Object> redisTemplate() {
+        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory());
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(String.class));
