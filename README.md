@@ -11,7 +11,10 @@
 
 ## Video
 
-![](video.gif)
+
+https://github.com/user-attachments/assets/9a19c2bc-dc39-4f1b-86ea-72556c62d94e
+
+
 
 ## 아키텍쳐 개선
 
