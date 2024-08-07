@@ -1,17 +1,14 @@
 spring:
   datasource:
-#    url: jdbc:mysql://root:root@localhost:3306/chat?createDatabaseIfNotExist=true
     url: jdbc:mysql://root:root@db:3306/chat?createDatabaseIfNotExist=true
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   data:
     mongodb:
-#      uri: mongodb://root:root@localhost:27017
       uri: mongodb://root:root@mongo:27017
       database: chat-app
 
     redis:
-#      host: localhost
       host: redis
       port: 6379
 

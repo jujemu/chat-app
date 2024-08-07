@@ -15,7 +15,6 @@ import org.springframework.data.redis.repository.configuration.EnableRedisReposi
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-@Profile("dev")
 @RequiredArgsConstructor
 @Configuration
 @EnableRedisRepositories
@@ -23,20 +22,21 @@ public class RedisConfig {
 
     private final RedisProperties redisProperties;
 
-    // lettuce
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
         return new LettuceConnectionFactory(redisProperties.getHost(), redisProperties.getPort());
     }
 
-    // redisTemplate: default Value Type = JSON
-    // If you want to use String Type, you can change ValueSerializer to StringRedisSerializer or Use StringRedisTemplate
+    /*
+        redis key-value 기본값은 string(hash) 이기 때문에
+        value 로 자바 Object 를 전달하기 위한 설정
+     */
     @Bean
-    public RedisTemplate<?, ?> redisTemplate() {
-        RedisTemplate<?, ?> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(redisConnectionFactory());   //connection
-        redisTemplate.setKeySerializer(new StringRedisSerializer());    // key
-        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(String.class)); //Java Obj <-> JSON -> String Value
+    public RedisTemplate<String, Object> redisTemplate() {
+        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(redisConnectionFactory());
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(String.class));
         return redisTemplate;
     }
 
